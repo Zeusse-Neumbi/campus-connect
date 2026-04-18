@@ -1,5 +1,8 @@
 package com.example.school.dao.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.school.dao.StudentDao;
 import com.example.school.dao.db.DatabaseManager;
 import com.example.school.model.Student;
@@ -9,35 +12,38 @@ import java.util.List;
 import java.util.Optional;
 
 public class StudentDaoSqliteImpl implements StudentDao {
+    private static final Logger log = LoggerFactory.getLogger(StudentDaoSqliteImpl.class);
 
     @Override
     public void save(Student student) {
-        String sql = "INSERT INTO students (user_id, student_number, email, date_of_birth) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO students (user_id, student_number, date_of_birth, gender, admission_date) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, student.getUserId());
             pstmt.setString(2, student.getStudentNumber());
-            pstmt.setString(3, student.getEmail());
-            pstmt.setString(4, student.getDateOfBirth());
+            pstmt.setString(3, student.getDateOfBirth());
+            pstmt.setString(4, student.getGender());
+            pstmt.setString(5, student.getAdmissionDate());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
     @Override
     public void update(Student student) {
-        String sql = "UPDATE students SET user_id = ?, student_number = ?, email = ?, date_of_birth = ? WHERE id = ?";
+        String sql = "UPDATE students SET user_id = ?, student_number = ?, date_of_birth = ?, gender = ?, admission_date = ? WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, student.getUserId());
             pstmt.setString(2, student.getStudentNumber());
-            pstmt.setString(3, student.getEmail());
-            pstmt.setString(4, student.getDateOfBirth());
-            pstmt.setInt(5, student.getId());
+            pstmt.setString(3, student.getDateOfBirth());
+            pstmt.setString(4, student.getGender());
+            pstmt.setString(5, student.getAdmissionDate());
+            pstmt.setInt(6, student.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
@@ -49,7 +55,7 @@ public class StudentDaoSqliteImpl implements StudentDao {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
@@ -65,7 +71,7 @@ public class StudentDaoSqliteImpl implements StudentDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -82,7 +88,7 @@ public class StudentDaoSqliteImpl implements StudentDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -99,7 +105,7 @@ public class StudentDaoSqliteImpl implements StudentDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -115,7 +121,7 @@ public class StudentDaoSqliteImpl implements StudentDao {
                 students.add(mapResultSetToStudent(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return students;
     }
@@ -128,7 +134,7 @@ public class StudentDaoSqliteImpl implements StudentDao {
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
@@ -137,7 +143,7 @@ public class StudentDaoSqliteImpl implements StudentDao {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT s.* FROM students s " +
                 "JOIN users u ON s.user_id = u.id " +
-                "WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR s.student_number LIKE ? OR s.email LIKE ? " +
+                "WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR s.student_number LIKE ? " +
                 "LIMIT ? OFFSET ?";
         int offset = (page - 1) * pageSize;
         if (offset < 0)
@@ -149,16 +155,15 @@ public class StudentDaoSqliteImpl implements StudentDao {
             pstmt.setString(1, searchPattern);
             pstmt.setString(2, searchPattern);
             pstmt.setString(3, searchPattern);
-            pstmt.setString(4, searchPattern);
-            pstmt.setInt(5, pageSize);
-            pstmt.setInt(6, offset);
+            pstmt.setInt(4, pageSize);
+            pstmt.setInt(5, offset);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     students.add(mapResultSetToStudent(rs));
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return students;
     }
@@ -167,31 +172,34 @@ public class StudentDaoSqliteImpl implements StudentDao {
     public int count(String query) {
         String sql = "SELECT COUNT(*) FROM students s " +
                 "JOIN users u ON s.user_id = u.id " +
-                "WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR s.student_number LIKE ? OR s.email LIKE ?";
+                "WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR s.student_number LIKE ?";
         String searchPattern = "%" + query + "%";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, searchPattern);
             pstmt.setString(2, searchPattern);
             pstmt.setString(3, searchPattern);
-            pstmt.setString(4, searchPattern);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return 0;
     }
 
     private Student mapResultSetToStudent(ResultSet rs) throws SQLException {
-        return new Student(
+        Student s = new Student(
                 rs.getInt("id"),
                 rs.getInt("user_id"),
                 rs.getString("student_number"),
-                rs.getString("email"),
-                rs.getString("date_of_birth"));
+                rs.getString("date_of_birth"),
+                rs.getString("gender"),
+                rs.getString("admission_date"));
+        s.setCreatedAt(rs.getString("created_at"));
+        s.setUpdatedAt(rs.getString("updated_at"));
+        return s;
     }
 }

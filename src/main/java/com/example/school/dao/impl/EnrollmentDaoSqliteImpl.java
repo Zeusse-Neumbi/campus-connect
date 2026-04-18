@@ -1,5 +1,8 @@
 package com.example.school.dao.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.school.dao.EnrollmentDao;
 import com.example.school.dao.db.DatabaseManager;
 import com.example.school.model.Enrollment;
@@ -9,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class EnrollmentDaoSqliteImpl implements EnrollmentDao {
+    private static final Logger log = LoggerFactory.getLogger(EnrollmentDaoSqliteImpl.class);
 
     @Override
     public void save(Enrollment enrollment) {
@@ -20,7 +24,7 @@ public class EnrollmentDaoSqliteImpl implements EnrollmentDao {
             pstmt.setString(3, enrollment.getEnrollmentDate());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
@@ -40,7 +44,7 @@ public class EnrollmentDaoSqliteImpl implements EnrollmentDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -62,7 +66,7 @@ public class EnrollmentDaoSqliteImpl implements EnrollmentDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return list;
     }
@@ -84,7 +88,7 @@ public class EnrollmentDaoSqliteImpl implements EnrollmentDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return list;
     }
@@ -100,7 +104,7 @@ public class EnrollmentDaoSqliteImpl implements EnrollmentDao {
                 return rs.next();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return false;
     }
@@ -114,7 +118,7 @@ public class EnrollmentDaoSqliteImpl implements EnrollmentDao {
             pstmt.setInt(2, courseId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 }

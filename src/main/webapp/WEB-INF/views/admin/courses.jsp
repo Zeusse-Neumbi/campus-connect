@@ -1,13 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>Course Management - School Management</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <style>
-        .sidebar { position: fixed; height: 100vh; }
-        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
-    </style>
 </head>
 <body>
 
@@ -24,9 +21,19 @@
         </div>
 
         <div class="glass-panel" style="padding: 2rem;">
-            <div class="flex-between mb-2">
-                <h3>Course Catalog</h3>
-                <button class="btn btn-primary btn-sm" onclick="openModal('create')">+ Create Course</button>
+            <div class="page-toolbar">
+                <div class="toolbar-left">
+                    <form action="${pageContext.request.contextPath}/admin/courses" method="get" style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" name="q" class="form-control" placeholder="Search by name, code or teacher..." value="${searchQuery}">
+                        <button type="submit" class="btn btn-sm btn-primary">Search</button>
+                        <c:if test="${not empty searchQuery}">
+                            <a href="${pageContext.request.contextPath}/admin/courses" class="btn btn-sm btn-secondary" style="line-height: 2;">Clear</a>
+                        </c:if>
+                    </form>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-primary btn-sm" onclick="openModal('create')">+ Create Course</button>
+                </div>
             </div>
             
             <div class="table-container">
@@ -69,6 +76,9 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination -->
+            <tags:pagination currentPage="${currentPage}" totalPages="${totalPages}" queryString="&q=${searchQuery}" />
         </div>
     </div>
 </div>
@@ -117,47 +127,7 @@
     <input type="hidden" name="id" id="deleteId">
 </form>
 
-<script>
-    const modal = document.getElementById("courseModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const formAction = document.getElementById("formAction");
-    const courseIdInput = document.getElementById("courseId");
-
-    function openModal(mode, id, courseName, courseCode, teacherId, credits) {
-        modal.style.display = "block";
-        if (mode === 'create') {
-            modalTitle.innerText = "Create New Course";
-            formAction.value = "create";
-            document.getElementById("courseForm").reset();
-            courseIdInput.value = "";
-        } else {
-            modalTitle.innerText = "Edit Course";
-            formAction.value = "update";
-            courseIdInput.value = id;
-            document.getElementById("courseName").value = courseName;
-            document.getElementById("courseCode").value = courseCode;
-            document.getElementById("teacherId").value = teacherId;
-            document.getElementById("credits").value = credits;
-        }
-    }
-
-    function closeModal() {
-        modal.style.display = "none";
-    }
-
-    function deleteCourse(id) {
-        if(confirm("Are you sure you want to delete this course?")) {
-            document.getElementById("deleteId").value = id;
-            document.getElementById("deleteForm").submit();
-        }
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            closeModal();
-        }
-    }
-</script>
+<script src="${pageContext.request.contextPath}/assets/js/admin/courses.js"></script>
 
 </body>
 </html>

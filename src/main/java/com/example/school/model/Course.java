@@ -2,20 +2,21 @@ package com.example.school.model;
 
 public class Course {
     private int id;
-    private String courseName;
     private String courseCode;
-    private int teacherId;
+    private String courseName;
+    private String description;
     private int credits;
+    private int teacherId;
+    private String createdAt;
+    private String updatedAt;
 
-    public Course() {
-    }
-
-    public Course(int id, String courseName, String courseCode, int teacherId, int credits) {
+    public Course(int id, String courseCode, String courseName, String description, int credits, int teacherId) {
         this.id = id;
-        this.courseName = courseName;
         this.courseCode = courseCode;
-        this.teacherId = teacherId;
+        this.courseName = courseName;
+        this.description = description;
         this.credits = credits;
+        this.teacherId = teacherId;
     }
 
     public int getId() {
@@ -26,6 +27,14 @@ public class Course {
         this.id = id;
     }
 
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
     public String getCourseName() {
         return courseName;
     }
@@ -34,12 +43,20 @@ public class Course {
         this.courseName = courseName;
     }
 
-    public String getCourseCode() {
-        return courseCode;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public void setCredits(int credits) {
+        this.credits = credits;
     }
 
     public int getTeacherId() {
@@ -50,11 +67,19 @@ public class Course {
         this.teacherId = teacherId;
     }
 
-    public int getCredits() {
-        return credits;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCredits(int credits) {
-        this.credits = credits;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

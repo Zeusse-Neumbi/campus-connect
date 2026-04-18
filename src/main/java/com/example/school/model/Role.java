@@ -1,30 +1,35 @@
 package com.example.school.model;
 
-public class Role {
-    private int id;
-    private String roleName;
+/**
+ * Represents the role of a User in the system.
+ */
+public enum Role {
+    ADMIN(1),
+    TEACHER(2),
+    STUDENT(3),
+    PARENT(4);
 
-    public Role() {
-    }
+    private final int id;
 
-    public Role(int id, String roleName) {
+    Role(int id) {
         this.id = id;
-        this.roleName = roleName;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    /**
+     * Resolves a Role from its corresponding integer ID.
+     * @param id The role ID (1=ADMIN, 2=TEACHER, etc.)
+     * @return The Role enum, or null if invalid
+     */
+    public static Role fromId(int id) {
+        for (Role role : values()) {
+            if (role.id == id) {
+                return role;
+            }
+        }
+        return null;
     }
 }

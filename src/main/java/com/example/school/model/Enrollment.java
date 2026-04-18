@@ -6,9 +6,6 @@ public class Enrollment {
     private int courseId;
     private String enrollmentDate;
 
-    public Enrollment() {
-    }
-
     public Enrollment(int id, int studentId, int courseId, String enrollmentDate) {
         this.id = id;
         this.studentId = studentId;

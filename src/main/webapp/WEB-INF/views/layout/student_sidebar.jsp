@@ -10,22 +10,32 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/student/courses">
+            <a href="${pageContext.request.contextPath}/student/courses" class="${pageContext.request.requestURI.endsWith('/courses.jsp') ? 'active' : ''}">
                 My Courses
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/student/grades">
+            <a href="${pageContext.request.contextPath}/student/grades" class="${pageContext.request.requestURI.endsWith('/grades.jsp') ? 'active' : ''}">
                 Grades
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/student/attendance">
+            <a href="${pageContext.request.contextPath}/student/attendance" class="${pageContext.request.requestURI.endsWith('/attendance.jsp') ? 'active' : ''}">
                 Attendance
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/student/profile">
+            <a href="${pageContext.request.contextPath}/student/groups" class="${pageContext.request.requestURI.endsWith('/groups.jsp') ? 'active' : ''}">
+                My Groups
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/student/transcript" class="${pageContext.request.requestURI.endsWith('/transcript.jsp') ? 'active' : ''}">
+                Transcript
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/student/profile" class="${pageContext.request.requestURI.endsWith('/profile.jsp') ? 'active' : ''}">
                 Profile
             </a>
         </li>

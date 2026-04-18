@@ -1,0 +1,114 @@
+/* ============================================================
+   PAGE — Teacher Dashboard (timetable, quick stats)
+   ============================================================ */
+
+/* Weekly Timetable Grid — 4 time-slots × 7 days */
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 120px repeat(7, 1fr);
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.timetable-header {
+    background: rgba(255, 255, 255, 0.85);
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--text-main);
+    border-bottom: 2px solid rgba(79, 70, 229, 0.1);
+}
+
+.timetable-header.today-col {
+    background: rgba(79, 70, 229, 0.12);
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.timetable-time {
+    background: rgba(255, 255, 255, 0.75);
+    padding: 0.6rem 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.timetable-cell {
+    background: rgba(255, 255, 255, 0.55);
+    padding: 0.4rem;
+    min-height: 70px;
+    position: relative;
+    transition: background 0.2s;
+}
+
+.timetable-cell:hover {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.timetable-cell.today-col {
+    background: rgba(79, 70, 229, 0.05);
+}
+
+.session-chip {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(139, 92, 246, 0.15));
+    border: 1px solid rgba(79, 70, 229, 0.25);
+    border-radius: 8px;
+    padding: 0.4rem 0.5rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.72rem;
+    line-height: 1.3;
+}
+
+.session-chip .chip-course { font-weight: 700; color: var(--primary-color); }
+.session-chip .chip-time   { color: var(--accent-color); font-size: 0.68rem; }
+.session-chip .chip-room   { color: var(--text-muted); font-size: 0.68rem; }
+
+/* Quick Stats Row */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.quick-stats .stat-card {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(31, 38, 135, 0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.quick-stats .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(31, 38, 135, 0.15);
+}
+
+.quick-stats .stat-card .stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.quick-stats .stat-card .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}

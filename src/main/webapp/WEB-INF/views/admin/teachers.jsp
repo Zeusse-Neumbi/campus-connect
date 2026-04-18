@@ -1,13 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>Teacher Management - School Management</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <style>
-        .sidebar { position: fixed; height: 100vh; }
-        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
-    </style>
 </head>
 <body>
 
@@ -24,19 +21,20 @@
         </div>
 
         <div class="glass-panel" style="padding: 2rem;">
-            <div class="flex-between mb-2">
-                <h3>Faculty Members</h3>
-                <!-- Creation handled via User Management -->
+            <div class="page-toolbar">
+                <div class="toolbar-left">
+                    <form action="${pageContext.request.contextPath}/admin/teachers" method="get" style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" name="q" class="form-control" placeholder="Search by name or specialization..." value="${searchQuery}">
+                        <button type="submit" class="btn btn-sm btn-primary">Search</button>
+                        <c:if test="${not empty searchQuery}">
+                            <a href="${pageContext.request.contextPath}/admin/teachers" class="btn btn-sm btn-secondary" style="line-height: 2;">Clear</a>
+                        </c:if>
+                    </form>
+                </div>
+                <div class="toolbar-right">
+                    <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-primary btn-sm">+ Add via User Management</a>
+                </div>
             </div>
-
-            <!-- Search Bar -->
-            <form action="${pageContext.request.contextPath}/admin/teachers" method="get" class="mb-2" style="display:flex; gap:10px;">
-                <input type="text" name="q" class="form-control" placeholder="Search by name or specialization..." value="${searchQuery}" style="width: 300px;">
-                <button type="submit" class="btn btn-sm btn-primary">Search</button>
-                <c:if test="${not empty searchQuery}">
-                    <a href="${pageContext.request.contextPath}/admin/teachers" class="btn btn-sm btn-secondary" style="line-height: 2;">Clear</a>
-                </c:if>
-            </form>
             
             <div class="table-container">
                 <table>
@@ -56,7 +54,7 @@
                                 <td>${t.specialization}</td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/admin/impersonate?userId=${t.userId}" class="btn btn-sm btn-primary">View Dashboard</a>
-                                    <button class="btn btn-sm btn-primary" onclick="openModal('update', ${t.id}, ${t.userId}, '${t.employeeId}', '${t.email}', '${t.specialization}')">Edit</button>
+                                    <button class="btn btn-sm btn-primary" onclick="openModal('update', ${t.id}, ${t.userId}, '${t.employeeId}', '${t.specialization}')">Edit</button>
                                     <button class="btn btn-sm btn-danger" onclick="deleteTeacher(${t.id})">Delete</button>
                                 </td>
                             </tr>
@@ -71,17 +69,7 @@
             </div>
 
             <!-- Pagination -->
-            <div class="pagination" style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 5px;">
-                <c:if test="${currentPage > 1}">
-                    <a href="?page=${currentPage - 1}&q=${searchQuery}" class="btn btn-sm btn-secondary">Previous</a>
-                </c:if>
-                <c:forEach begin="1" end="${totalPages}" var="i">
-                    <a href="?page=${i}&q=${searchQuery}" class="btn btn-sm ${currentPage == i ? 'btn-primary' : 'btn-secondary'}">${i}</a>
-                </c:forEach>
-                <c:if test="${currentPage < totalPages}">
-                    <a href="?page=${currentPage + 1}&q=${searchQuery}" class="btn btn-sm btn-secondary">Next</a>
-                </c:if>
-            </div>
+            <tags:pagination currentPage="${currentPage}" totalPages="${totalPages}" queryString="&q=${searchQuery}" />
         </div>
     </div>
 </div>
@@ -100,10 +88,6 @@
                 <input type="text" name="employeeId" id="employeeId" class="form-control" required>
             </div>
             <div class="form-group">
-                <label>Email (Work)</label>
-                <input type="email" name="email" id="email" class="form-control" required>
-            </div>
-            <div class="form-group">
                 <label>Specialization</label>
                 <input type="text" name="specialization" id="specialization" class="form-control" required>
             </div>
@@ -118,49 +102,7 @@
     <input type="hidden" name="id" id="deleteId">
 </form>
 
-<script>
-    const modal = document.getElementById("teacherModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const formAction = document.getElementById("formAction");
-    const teacherIdInput = document.getElementById("teacherId");
-    const userIdInput = document.getElementById("userId");
-
-    function openModal(mode, id, userId, employeeId, email, specialization) {
-        modal.style.display = "block";
-        if (mode === 'create') {
-            // Creation is not used from here anymore
-            modalTitle.innerText = "Add New Teacher";
-            formAction.value = "create";
-            document.getElementById("teacherForm").reset();
-            teacherIdInput.value = "";
-        } else {
-            modalTitle.innerText = "Edit Teacher";
-            formAction.value = "update";
-            teacherIdInput.value = id;
-            userIdInput.value = userId;
-            document.getElementById("employeeId").value = employeeId;
-            document.getElementById("email").value = email;
-            document.getElementById("specialization").value = specialization;
-        }
-    }
-
-    function closeModal() {
-        modal.style.display = "none";
-    }
-
-    function deleteTeacher(id) {
-        if(confirm("Are you sure you want to remove this teacher record?")) {
-            document.getElementById("deleteId").value = id;
-            document.getElementById("deleteForm").submit();
-        }
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            closeModal();
-        }
-    }
-</script>
+<script src="${pageContext.request.contextPath}/assets/js/admin/teachers.js"></script>
 
 </body>
 </html>

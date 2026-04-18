@@ -1,0 +1,24 @@
+/* ============================================================
+   PAGE — Teacher Grades Management
+   ============================================================ */
+
+.exam-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.remark-input {
+    width: 140px;
+    font-size: 0.85rem;
+}
+
+.max-score-badge {
+    display: inline-block;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}

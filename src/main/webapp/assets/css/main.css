@@ -1,0 +1,21 @@
+/* ============================================================
+   MAIN — CSS Aggregator
+   Import all shared styles from modular files.
+   Page-specific CSS should be linked separately in each JSP.
+   ============================================================ */
+
+/* Foundation */
+@import url('base.css');
+@import url('layout.css');
+@import url('animations.css');
+
+/* Components */
+@import url('components/buttons.css');
+@import url('components/badges.css');
+@import url('components/cards.css');
+@import url('components/forms.css');
+@import url('components/tables.css');
+@import url('components/modals.css');
+
+/* Utilities */
+@import url('utilities.css');

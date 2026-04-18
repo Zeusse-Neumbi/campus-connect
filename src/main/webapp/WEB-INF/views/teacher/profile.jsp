@@ -2,12 +2,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>My Profile - School Management</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <style>
-        .sidebar { position: fixed; height: 100vh; }
-        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
-    </style>
 </head>
 <body>
 
@@ -43,6 +39,11 @@
                 <div class="input-group">
                     <label>Specialization</label>
                     <input type="text" class="input-field" value="Computer Science" readonly style="background: rgba(0,0,0,0.05); cursor: not-allowed;">
+                </div>
+
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" class="input-field" value="${sessionScope.user.phone}">
                 </div>
 
                 <div class="input-group">

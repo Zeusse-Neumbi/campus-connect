@@ -18,4 +18,8 @@ public interface CourseDao {
     List<Course> findByTeacherId(int teacherId);
 
     List<Course> findByStudentId(int studentId);
+
+    List<Course> search(String query, int page, int pageSize);
+
+    int count(String query);
 }

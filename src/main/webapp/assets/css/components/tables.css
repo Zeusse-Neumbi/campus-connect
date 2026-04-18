@@ -1,0 +1,79 @@
+/* ============================================================
+   COMPONENTS — Tables, Toolbar, Pagination
+   ============================================================ */
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+th {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Page Toolbar — consistent header for all admin list pages */
+.page-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.page-toolbar .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.page-toolbar .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-toolbar .toolbar-right .form-control {
+    width: 280px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.pagination .btn {
+    min-width: 38px;
+    text-align: center;
+}
+
+.pagination-ellipsis {
+    padding: 0.4rem 0.3rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 2px;
+    user-select: none;
+}

@@ -1,13 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>Attendance - School Management</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <style>
-        .sidebar { position: fixed; height: 100vh; }
-        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/teacher-attendance.css">
 </head>
 <body>
 
@@ -24,43 +22,69 @@
         </div>
 
         <div class="glass-panel" style="padding: 2rem;">
-            <div class="table-container">
+            <div class="table-container" style="overflow-x: auto;">
                 <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Course</th>
-                            <th>Status</th>
-                            <th>Remarks</th>
+                            <th style="position: sticky; left: 0; background: rgba(255,255,255,0.95); z-index: 2;">Course</th>
+                            <c:forEach var="date" items="${allSessionDates}">
+                                <th style="text-align: center; font-size: 0.72rem; min-width: 45px; padding: 0.5rem 0.3rem;">
+                                    ${date}
+                                </th>
+                            </c:forEach>
+                            <th style="text-align: center;">Rate</th>
                         </tr>
                     </thead>
                     <tbody>
-                         <c:forEach var="enrollment" items="${enrollments}">
-                            <c:set var="attendances" value="${attendanceMap[enrollment.id]}" />
-                            <c:set var="course" value="${courseMap[enrollment.courseId]}" />
-                            
-                            <c:forEach var="att" items="${attendances}">
-                                <tr>
-                                    <td>${att.attendanceDate}</td>
-                                    <td>${course.courseName}</td>
-                                    <td>
+                        <c:forEach var="row" items="${attendanceMatrix}">
+                            <tr>
+                                <td style="position: sticky; left: 0; background: rgba(255,255,255,0.95); z-index: 1; white-space: nowrap;">
+                                    <strong>${row.course.courseName}</strong>
+                                    <br><span style="color: var(--text-muted); font-size: 0.78rem;">${row.course.courseCode}</span>
+                                </td>
+                                <c:forEach var="date" items="${allSessionDates}">
+                                    <c:set var="st" value="${row.dateStatuses[date]}" />
+                                    <td style="text-align: center; padding: 0.4rem;">
                                         <c:choose>
-                                            <c:when test="${att.status == 'PRESENT'}"><span class="badge badge-success">Present</span></c:when>
-                                            <c:when test="${att.status == 'LATE'}"><span class="badge badge-warning">Late</span></c:when>
-                                            <c:otherwise><span class="badge badge-danger">Absent</span></c:otherwise>
+                                            <c:when test="${st eq 'Present' || st eq 'PRESENT' || st eq 'present'}"><span class="att-status present" title="Present"></span></c:when>
+                                            <c:when test="${st eq 'Absent' || st eq 'ABSENT' || st eq 'absent'}"><span class="att-status absent" title="Absent"></span></c:when>
+                                            <c:when test="${st eq 'Late' || st eq 'LATE' || st eq 'late'}"><span class="att-status late" title="Late"></span></c:when>
+                                            <c:when test="${empty st || st eq 'NONE'}"><span class="att-status none" title="Not available / Not recorded"></span></c:when>
+                                            <c:otherwise><span class="att-status none" title="Not recorded"></span></c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td>-</td>
-                                </tr>
-                            </c:forEach>
-                        </c:forEach>
-                         <c:if test="${empty enrollments}">
-                             <tr>
-                                <td colspan="4" style="text-align:center;">No attendance records found.</td>
+                                </c:forEach>
+                                <td style="text-align: center;">
+                                    <c:choose>
+                                        <c:when test="${row.rate >= 80}">
+                                            <span class="att-rate good"><fmt:formatNumber value="${row.rate}" maxFractionDigits="0"/>%</span>
+                                        </c:when>
+                                        <c:when test="${row.rate >= 50}">
+                                            <span class="att-rate warn"><fmt:formatNumber value="${row.rate}" maxFractionDigits="0"/>%</span>
+                                        </c:when>
+                                        <c:when test="${row.rate >= 0}">
+                                            <span class="att-rate bad"><fmt:formatNumber value="${row.rate}" maxFractionDigits="0"/>%</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span style="color: var(--text-muted); font-size: 0.8rem;">—</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
                             </tr>
+                        </c:forEach>
+                        <c:if test="${empty attendanceMatrix}">
+                            <tr><td colspan="${allSessionDates.size() + 2}" style="text-align:center;">No enrolled courses found.</td></tr>
                         </c:if>
                     </tbody>
                 </table>
+            </div>
+
+            <%-- Legend --%>
+            <div class="att-legend" style="margin-top: 1.5rem;">
+                <div class="att-legend-item"><span class="att-status present"></span> Present</div>
+                <div class="att-legend-item"><span class="att-status late"></span> Late</div>
+                <div class="att-legend-item"><span class="att-status absent"></span> Absent</div>
+                <div class="att-legend-item"><span class="att-status none"></span> No Session / Not recorded</div>
             </div>
         </div>
     </div>

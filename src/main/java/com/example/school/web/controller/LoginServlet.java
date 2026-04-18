@@ -1,5 +1,6 @@
 package com.example.school.web.controller;
 
+import com.example.school.model.Role;
 import com.example.school.model.User;
 import com.example.school.service.ServiceFactory;
 import com.example.school.service.UserService;
@@ -29,7 +30,7 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
-            redirectUser(resp, user.getRoleId());
+            redirectUser(resp, user.getRole());
             return;
         }
 
@@ -47,7 +48,7 @@ public class LoginServlet extends HttpServlet {
             User user = userOpt.get();
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            redirectUser(resp, user.getRoleId());
+            redirectUser(resp, user.getRole());
             return;
         }
 
@@ -56,16 +57,23 @@ public class LoginServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
     }
 
-    private void redirectUser(HttpServletResponse resp, int roleId) throws IOException {
-        switch (roleId) {
-            case 1: // Admin
+    private void redirectUser(HttpServletResponse resp, Role role) throws IOException {
+        if (role == null) {
+            resp.sendRedirect("login?error=UnknownRole");
+            return;
+        }
+        switch (role) {
+            case ADMIN:
                 resp.sendRedirect("admin/dashboard");
                 break;
-            case 2: // Teacher
+            case TEACHER:
                 resp.sendRedirect("teacher/dashboard");
                 break;
-            case 3: // Student
+            case STUDENT:
                 resp.sendRedirect("student/dashboard");
+                break;
+            case PARENT:
+                resp.sendRedirect("parent/dashboard");
                 break;
             default:
                 resp.sendRedirect("login?error=UnknownRole");

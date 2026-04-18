@@ -4,18 +4,22 @@ public class Student {
     private int id;
     private int userId;
     private String studentNumber;
-    private String email;
     private String dateOfBirth;
+    private String gender;
+    private String admissionDate;
+    private String createdAt;
+    private String updatedAt;
 
     public Student() {
     }
 
-    public Student(int id, int userId, String studentNumber, String email, String dateOfBirth) {
+    public Student(int id, int userId, String studentNumber, String dateOfBirth, String gender, String admissionDate) {
         this.id = id;
         this.userId = userId;
         this.studentNumber = studentNumber;
-        this.email = email;
         this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.admissionDate = admissionDate;
     }
 
     public int getId() {
@@ -42,19 +46,43 @@ public class Student {
         this.studentNumber = studentNumber;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getDateOfBirth() {
         return dateOfBirth;
     }
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getAdmissionDate() {
+        return admissionDate;
+    }
+
+    public void setAdmissionDate(String admissionDate) {
+        this.admissionDate = admissionDate;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

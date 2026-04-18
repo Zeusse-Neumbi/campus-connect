@@ -28,13 +28,19 @@ public class TeacherServiceTest {
     @Mock
     private EnrollmentDao enrollmentDao;
     @Mock
-    private GradeDao gradeDao;
+    private ExamDao examDao;
+    @Mock
+    private ExamResultDao examResultDao;
     @Mock
     private AttendanceDao attendanceDao;
     @Mock
     private StudentDao studentDao;
     @Mock
     private UserDao userDao;
+    @Mock
+    private CourseSessionDao courseSessionDao;
+    @Mock
+    private ClassroomDao classroomDao;
 
     @InjectMocks
     private TeacherService teacherService;
@@ -42,7 +48,7 @@ public class TeacherServiceTest {
     @Test
     void getTeacherCourses_ShouldReturnCourses() {
         int teacherId = 1;
-        Course c1 = new Course(101, "Math", "MATH101", teacherId, 3);
+        Course c1 = new Course(101, "MATH101", "Math", "desc", 3, teacherId);
         when(courseDao.findByTeacherId(teacherId)).thenReturn(Collections.singletonList(c1));
 
         List<Course> courses = teacherService.getTeacherCourses(teacherId);
@@ -54,8 +60,8 @@ public class TeacherServiceTest {
     @Test
     void getStudentCountForTeacher_ShouldReturnTotalStudents() {
         int teacherId = 1;
-        Course c1 = new Course(101, "Math", "MATH101", teacherId, 3);
-        Course c2 = new Course(102, "Science", "SCI101", teacherId, 3);
+        Course c1 = new Course(101, "MATH101", "Math", "desc", 3, teacherId);
+        Course c2 = new Course(102, "SCI101", "Science", "desc", 3, teacherId);
         when(courseDao.findByTeacherId(teacherId)).thenReturn(Arrays.asList(c1, c2));
 
         Enrollment e1 = new Enrollment(1, 1, 101, "2023-01-01");
@@ -71,42 +77,44 @@ public class TeacherServiceTest {
     }
 
     @Test
-    void updateGrade_ShouldUpdateExistingGrade_WhenGradeExists() {
-        int enrollmentId = 1;
-        double gradeVal = 18.0;
-        Grade existingGrade = new Grade(1, enrollmentId, 15.0, "2023-01-01");
+    void updateExamResult_ShouldUpdateExisting_WhenResultExists() {
+        int examId = 1;
+        int studentId = 1;
+        int score = 18;
+        ExamResult existing = new ExamResult(1, examId, studentId, 15, "2023-01-01", null);
 
-        when(gradeDao.findByEnrollmentId(enrollmentId)).thenReturn(Collections.singletonList(existingGrade));
+        when(examResultDao.findByExamIdAndStudentId(examId, studentId)).thenReturn(Optional.of(existing));
 
-        teacherService.updateGrade(enrollmentId, gradeVal);
+        teacherService.updateExamResult(examId, studentId, score);
 
-        verify(gradeDao).update(any(Grade.class));
-        verify(gradeDao, never()).save(any(Grade.class));
+        verify(examResultDao).update(any(ExamResult.class));
+        verify(examResultDao, never()).save(any(ExamResult.class));
     }
 
     @Test
-    void updateGrade_ShouldCreateNewGrade_WhenNoGradeExists() {
-        int enrollmentId = 1;
-        double gradeVal = 18.0;
+    void updateExamResult_ShouldCreateNew_WhenNoResultExists() {
+        int examId = 1;
+        int studentId = 1;
+        int score = 18;
 
-        when(gradeDao.findByEnrollmentId(enrollmentId)).thenReturn(Collections.emptyList());
+        when(examResultDao.findByExamIdAndStudentId(examId, studentId)).thenReturn(Optional.empty());
 
-        teacherService.updateGrade(enrollmentId, gradeVal);
+        teacherService.updateExamResult(examId, studentId, score);
 
-        verify(gradeDao).save(any(Grade.class));
-        verify(gradeDao, never()).update(any(Grade.class));
+        verify(examResultDao).save(any(ExamResult.class));
+        verify(examResultDao, never()).update(any(ExamResult.class));
     }
 
     @Test
     void updateAttendance_ShouldUpdateExisting_WhenRecordExists() {
-        int enrollmentId = 1;
-        String date = "2023-01-15";
+        int sessionId = 1;
+        int studentId = 1;
         String status = "PRESENT";
-        Attendance existing = new Attendance(1, enrollmentId, date, "ABSENT");
+        Attendance existing = new Attendance(1, sessionId, studentId, "ABSENT", "2023-01-15");
 
-        when(attendanceDao.findByEnrollmentIdAndDate(enrollmentId, date)).thenReturn(Optional.of(existing));
+        when(attendanceDao.findBySessionIdAndStudentId(sessionId, studentId)).thenReturn(Optional.of(existing));
 
-        teacherService.updateAttendance(enrollmentId, date, status);
+        teacherService.updateAttendance(sessionId, studentId, status);
 
         verify(attendanceDao).update(any(Attendance.class));
         verify(attendanceDao, never()).save(any(Attendance.class));
@@ -114,13 +122,13 @@ public class TeacherServiceTest {
 
     @Test
     void updateAttendance_ShouldCreateNew_WhenNoRecordExists() {
-        int enrollmentId = 1;
-        String date = "2023-01-15";
+        int sessionId = 1;
+        int studentId = 1;
         String status = "PRESENT";
 
-        when(attendanceDao.findByEnrollmentIdAndDate(enrollmentId, date)).thenReturn(Optional.empty());
+        when(attendanceDao.findBySessionIdAndStudentId(sessionId, studentId)).thenReturn(Optional.empty());
 
-        teacherService.updateAttendance(enrollmentId, date, status);
+        teacherService.updateAttendance(sessionId, studentId, status);
 
         verify(attendanceDao).save(any(Attendance.class));
         verify(attendanceDao, never()).update(any(Attendance.class));

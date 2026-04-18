@@ -2,18 +2,17 @@ package com.example.school.model;
 
 public class Attendance {
     private int id;
-    private int enrollmentId;
-    private String attendanceDate;
+    private int courseSessionId;
+    private int studentId;
     private String status;
+    private String markedAt;
 
-    public Attendance() {
-    }
-
-    public Attendance(int id, int enrollmentId, String attendanceDate, String status) {
+    public Attendance(int id, int courseSessionId, int studentId, String status, String markedAt) {
         this.id = id;
-        this.enrollmentId = enrollmentId;
-        this.attendanceDate = attendanceDate;
+        this.courseSessionId = courseSessionId;
+        this.studentId = studentId;
         this.status = status;
+        this.markedAt = markedAt;
     }
 
     public int getId() {
@@ -24,20 +23,20 @@ public class Attendance {
         this.id = id;
     }
 
-    public int getEnrollmentId() {
-        return enrollmentId;
+    public int getCourseSessionId() {
+        return courseSessionId;
     }
 
-    public void setEnrollmentId(int enrollmentId) {
-        this.enrollmentId = enrollmentId;
+    public void setCourseSessionId(int courseSessionId) {
+        this.courseSessionId = courseSessionId;
     }
 
-    public String getAttendanceDate() {
-        return attendanceDate;
+    public int getStudentId() {
+        return studentId;
     }
 
-    public void setAttendanceDate(String attendanceDate) {
-        this.attendanceDate = attendanceDate;
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
     }
 
     public String getStatus() {
@@ -46,5 +45,13 @@ public class Attendance {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getMarkedAt() {
+        return markedAt;
+    }
+
+    public void setMarkedAt(String markedAt) {
+        this.markedAt = markedAt;
     }
 }

@@ -7,20 +7,12 @@ public class User {
     private int roleId;
     private String firstName;
     private String lastName;
-
-    public User() {
-    }
+    private String phone;
+    private String createdAt;
+    private String updatedAt;
 
     public User(int id, String email, String password, int roleId, String firstName, String lastName) {
         this.id = id;
-        this.email = email;
-        this.password = password;
-        this.roleId = roleId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public User(String email, String password, int roleId, String firstName, String lastName) {
         this.email = email;
         this.password = password;
         this.roleId = roleId;
@@ -60,6 +52,16 @@ public class User {
         this.roleId = roleId;
     }
 
+    public Role getRole() {
+        return Role.fromId(this.roleId);
+    }
+
+    public void setRole(Role role) {
+        if (role != null) {
+            this.roleId = role.getId();
+        }
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -74,5 +76,29 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

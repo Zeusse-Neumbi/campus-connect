@@ -2,8 +2,9 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>Login - School Management System</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/login.css">
 </head>
 <body class="login-body">
 

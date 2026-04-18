@@ -8,6 +8,7 @@ public class ServiceFactory {
     private static StudentService studentService;
     private static TeacherService teacherService;
     private static AdminService adminService;
+    private static ParentService parentService;
 
     public static synchronized UserService getUserService() {
         if (userService == null) {
@@ -22,10 +23,15 @@ public class ServiceFactory {
                     new StudentDaoSqliteImpl(),
                     new CourseDaoSqliteImpl(),
                     new EnrollmentDaoSqliteImpl(),
-                    new GradeDaoSqliteImpl(),
+                    new ExamDaoSqliteImpl(),
+                    new ExamResultDaoSqliteImpl(),
                     new AttendanceDaoSqliteImpl(),
                     new TeacherDaoSqliteImpl(),
-                    new UserDaoSqliteImpl());
+                    new UserDaoSqliteImpl(),
+                    new CourseSessionDaoSqliteImpl(),
+                    new ClassroomDaoSqliteImpl(),
+                    new CourseGroupDaoSqliteImpl(),
+                    new StudentGroupDaoSqliteImpl());
         }
         return studentService;
     }
@@ -38,8 +44,13 @@ public class ServiceFactory {
                     new EnrollmentDaoSqliteImpl(),
                     new StudentDaoSqliteImpl(),
                     new UserDaoSqliteImpl(),
-                    new GradeDaoSqliteImpl(),
-                    new AttendanceDaoSqliteImpl());
+                    new ExamDaoSqliteImpl(),
+                    new ExamResultDaoSqliteImpl(),
+                    new AttendanceDaoSqliteImpl(),
+                    new CourseSessionDaoSqliteImpl(),
+                    new ClassroomDaoSqliteImpl(),
+                    new CourseGroupDaoSqliteImpl(),
+                    new StudentGroupDaoSqliteImpl());
         }
         return teacherService;
     }
@@ -50,8 +61,34 @@ public class ServiceFactory {
                     new UserDaoSqliteImpl(),
                     new StudentDaoSqliteImpl(),
                     new TeacherDaoSqliteImpl(),
-                    new CourseDaoSqliteImpl());
+                    new CourseDaoSqliteImpl(),
+                    new ClassroomDaoSqliteImpl(),
+                    new CourseGroupDaoSqliteImpl(),
+                    new CourseSessionDaoSqliteImpl(),
+                    new ParentDaoSqliteImpl(),
+                    new StudentParentDaoSqliteImpl(),
+                    new EnrollmentDaoSqliteImpl(),
+                    new ExamDaoSqliteImpl(),
+                    new ExamResultDaoSqliteImpl(),
+                    new AttendanceDaoSqliteImpl());
         }
         return adminService;
+    }
+
+    public static synchronized ParentService getParentService() {
+        if (parentService == null) {
+            parentService = new ParentService(
+                    new ParentDaoSqliteImpl(),
+                    new StudentParentDaoSqliteImpl(),
+                    new StudentDaoSqliteImpl(),
+                    new UserDaoSqliteImpl(),
+                    new CourseDaoSqliteImpl(),
+                    new EnrollmentDaoSqliteImpl(),
+                    new ExamDaoSqliteImpl(),
+                    new ExamResultDaoSqliteImpl(),
+                    new AttendanceDaoSqliteImpl(),
+                    new CourseSessionDaoSqliteImpl());
+        }
+        return parentService;
     }
 }

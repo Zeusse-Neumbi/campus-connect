@@ -2,12 +2,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>My Courses - School Management</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <style>
-        .sidebar { position: fixed; height: 100vh; }
-        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
-    </style>
 </head>
 <body>
 
@@ -29,15 +25,7 @@
             <h3>Enrolled Courses</h3>
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Course Name</th>
-                            <th>Teacher</th>
-                            <th>Credits</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Code</th><th>Course Name</th><th>Teacher</th><th>Credits</th><th>Actions</th></tr></thead>
                     <tbody>
                         <c:forEach var="course" items="${enrolledCourses}">
                             <tr>
@@ -54,9 +42,7 @@
                             </tr>
                         </c:forEach>
                         <c:if test="${empty enrolledCourses}">
-                             <tr>
-                                <td colspan="5" style="text-align:center;">You are not currently enrolled in any courses.</td>
-                            </tr>
+                             <tr><td colspan="5" style="text-align:center;">You are not currently enrolled in any courses.</td></tr>
                         </c:if>
                     </tbody>
                 </table>
@@ -66,24 +52,13 @@
 </div>
 
 <!-- Enroll Modal -->
-<div id="enrollModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-    <div style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 60%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="margin: 0;">Available Courses</h2>
-            <span onclick="closeEnrollModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
-        </div>
-        
+<div id="enrollModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <span class="close" onclick="closeEnrollModal()">&times;</span>
+        <h2>Available Courses</h2>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Course Name</th>
-                        <th>Teacher</th>
-                        <th>Credits</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Code</th><th>Course Name</th><th>Teacher</th><th>Credits</th><th>Action</th></tr></thead>
                 <tbody>
                     <c:forEach var="course" items="${availableCourses}">
                         <tr>
@@ -100,36 +75,15 @@
                         </tr>
                     </c:forEach>
                     <c:if test="${empty availableCourses}">
-                         <tr>
-                            <td colspan="5" style="text-align:center;">No courses available for enrollment.</td>
-                        </tr>
+                         <tr><td colspan="5" style="text-align:center;">No courses available for enrollment.</td></tr>
                     </c:if>
                 </tbody>
             </table>
         </div>
-        <div style="margin-top: 15px; text-align: right;">
-            <button onclick="closeEnrollModal()" class="btn btn-sm" style="background-color: #ccc; color: black;">Close</button>
-        </div>
     </div>
 </div>
 
-<script>
-    function openEnrollModal() {
-        document.getElementById('enrollModal').style.display = "block";
-    }
-
-    function closeEnrollModal() {
-        document.getElementById('enrollModal').style.display = "none";
-    }
-
-    // Close modal if clicked outside
-    window.onclick = function(event) {
-        var modal = document.getElementById('enrollModal');
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-</script>
+<script src="${pageContext.request.contextPath}/assets/js/student/courses.js"></script>
 
 </body>
 </html>

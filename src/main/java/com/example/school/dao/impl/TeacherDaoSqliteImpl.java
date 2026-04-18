@@ -1,5 +1,8 @@
 package com.example.school.dao.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.school.dao.TeacherDao;
 import com.example.school.dao.db.DatabaseManager;
 import com.example.school.model.Teacher;
@@ -9,35 +12,36 @@ import java.util.List;
 import java.util.Optional;
 
 public class TeacherDaoSqliteImpl implements TeacherDao {
+    private static final Logger log = LoggerFactory.getLogger(TeacherDaoSqliteImpl.class);
 
     @Override
     public void save(Teacher teacher) {
-        String sql = "INSERT INTO teachers (user_id, employee_id, email, specialization) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO teachers (user_id, employee_id, specialization, hire_date) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, teacher.getUserId());
             pstmt.setString(2, teacher.getEmployeeId());
-            pstmt.setString(3, teacher.getEmail());
-            pstmt.setString(4, teacher.getSpecialization());
+            pstmt.setString(3, teacher.getSpecialization());
+            pstmt.setString(4, teacher.getHireDate());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
     @Override
     public void update(Teacher teacher) {
-        String sql = "UPDATE teachers SET user_id = ?, employee_id = ?, email = ?, specialization = ? WHERE id = ?";
+        String sql = "UPDATE teachers SET user_id = ?, employee_id = ?, specialization = ?, hire_date = ? WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, teacher.getUserId());
             pstmt.setString(2, teacher.getEmployeeId());
-            pstmt.setString(3, teacher.getEmail());
-            pstmt.setString(4, teacher.getSpecialization());
+            pstmt.setString(3, teacher.getSpecialization());
+            pstmt.setString(4, teacher.getHireDate());
             pstmt.setInt(5, teacher.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
@@ -49,7 +53,7 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
@@ -65,7 +69,7 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -82,7 +86,7 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -99,7 +103,7 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -115,7 +119,7 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
                 teachers.add(mapResultSetToTeacher(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return teachers;
     }
@@ -128,7 +132,7 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
@@ -158,7 +162,7 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return teachers;
     }
@@ -181,17 +185,20 @@ public class TeacherDaoSqliteImpl implements TeacherDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return 0;
     }
 
     private Teacher mapResultSetToTeacher(ResultSet rs) throws SQLException {
-        return new Teacher(
+        Teacher t = new Teacher(
                 rs.getInt("id"),
                 rs.getInt("user_id"),
                 rs.getString("employee_id"),
-                rs.getString("email"),
-                rs.getString("specialization"));
+                rs.getString("specialization"),
+                rs.getString("hire_date"));
+        t.setCreatedAt(rs.getString("created_at"));
+        t.setUpdatedAt(rs.getString("updated_at"));
+        return t;
     }
 }

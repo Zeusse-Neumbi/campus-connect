@@ -2,19 +2,16 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>Teacher Dashboard - School Management</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <style>
-        .sidebar { position: fixed; height: 100vh; }
-        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 2rem; }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/teacher-dashboard.css">
 </head>
 <body>
 
 <c:if test="${sessionScope.impersonating}">
     <div style="background: #f97316; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 9999;">
         <strong>⚠️ Viewing as: ${sessionScope.user.firstName} ${sessionScope.user.lastName}</strong>
-        <a href="${pageContext.request.contextPath}/admin/stop-impersonate" 
+        <a href="${pageContext.request.contextPath}/admin/stop-impersonate"
            class="btn btn-sm" style="margin-left: 20px; background: white; color: #f97316; border: none;">
            Stop Impersonating
         </a>
@@ -33,46 +30,140 @@
             </div>
         </div>
 
-        <div class="metric-grid">
-            <div class="glass-panel metric-card">
-                <div class="metric-value">${courseCount}</div>
-                <div class="metric-label">Active Courses</div>
+        <%-- Quick Stats --%>
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-value">${courseCount}</div>
+                <div class="stat-label">Active Courses</div>
             </div>
-            <div class="glass-panel metric-card">
-                <div class="metric-value" style="color: var(--secondary-color);">${studentCount}</div>
-                <div class="metric-label">Total Students</div>
+            <div class="stat-card">
+                <div class="stat-value" style="background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${studentCount}</div>
+                <div class="stat-label">Total Students</div>
             </div>
-            <div class="glass-panel metric-card">
-                <div class="metric-value" style="color: var(--primary-color);">0</div> <!- - TODO: Pending Grades - ->
-                <div class="metric-label">Pending Grades</div>
+            <div class="stat-card">
+                <div class="stat-value" style="background: linear-gradient(135deg, #f59e0b, #d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${todaySessions.size()}</div>
+                <div class="stat-label">Today's Sessions</div>
             </div>
         </div>
 
+        <%-- Weekly Timetable (Mon–Sun, 4 fixed time slots) --%>
+        <div class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">📅 Weekly Timetable</h3>
+                <form action="${pageContext.request.contextPath}/teacher/dashboard" method="get" style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-weight: bold; font-size: 0.85rem;">Week of:</span>
+                    <input type="date" name="targetDate" class="form-control" value="${targetDate}" style="width: auto;">
+                    <button type="submit" class="btn btn-sm btn-primary">Load</button>
+                    <c:if test="${not empty targetDate}">
+                        <a href="${pageContext.request.contextPath}/teacher/dashboard" class="btn btn-sm btn-secondary">Reset</a>
+                    </c:if>
+                </form>
+            </div>
+            <div class="timetable-grid">
+                <%-- Header row --%>
+                <div class="timetable-header">Time</div>
+                <c:forEach var="dayName" items="${weekDayNames}" varStatus="dayIdx">
+                    <div class="timetable-header ${weekDates[dayIdx.index] == todayDate ? 'today-col' : ''}">${dayName}</div>
+                </c:forEach>
+
+                <%-- Slot 1: 08:00 – 10:00 --%>
+                <div class="timetable-time">08:00<br>10:00</div>
+                <c:forEach var="dayDate" items="${weekDates}">
+                    <div class="timetable-cell ${dayDate == todayDate ? 'today-col' : ''}">
+                        <c:forEach var="ws" items="${weekSessions}">
+                            <c:if test="${ws.sessionDate == dayDate && ws.startTime == '08:00'}">
+                                <c:set var="crs" value="${courseMap[ws.courseId]}" />
+                                <c:set var="rm" value="${classroomMap[ws.classroomId]}" />
+                                <div class="session-chip">
+                                    <div class="chip-course">${crs != null ? crs.courseCode : '?'}</div>
+                                    <div class="chip-time">${ws.startTime} - ${ws.endTime}</div>
+                                    <div class="chip-room">${rm != null ? rm.roomCode : ''}</div>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </c:forEach>
+
+                <%-- Slot 2: 10:15 – 12:15 --%>
+                <div class="timetable-time">10:15<br>12:15</div>
+                <c:forEach var="dayDate" items="${weekDates}">
+                    <div class="timetable-cell ${dayDate == todayDate ? 'today-col' : ''}">
+                        <c:forEach var="ws" items="${weekSessions}">
+                            <c:if test="${ws.sessionDate == dayDate && ws.startTime == '10:15'}">
+                                <c:set var="crs" value="${courseMap[ws.courseId]}" />
+                                <c:set var="rm" value="${classroomMap[ws.classroomId]}" />
+                                <div class="session-chip">
+                                    <div class="chip-course">${crs != null ? crs.courseCode : '?'}</div>
+                                    <div class="chip-time">${ws.startTime} - ${ws.endTime}</div>
+                                    <div class="chip-room">${rm != null ? rm.roomCode : ''}</div>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </c:forEach>
+
+                <%-- Slot 3: 13:00 – 15:00 --%>
+                <div class="timetable-time">13:00<br>15:00</div>
+                <c:forEach var="dayDate" items="${weekDates}">
+                    <div class="timetable-cell ${dayDate == todayDate ? 'today-col' : ''}">
+                        <c:forEach var="ws" items="${weekSessions}">
+                            <c:if test="${ws.sessionDate == dayDate && ws.startTime == '13:00'}">
+                                <c:set var="crs" value="${courseMap[ws.courseId]}" />
+                                <c:set var="rm" value="${classroomMap[ws.classroomId]}" />
+                                <div class="session-chip">
+                                    <div class="chip-course">${crs != null ? crs.courseCode : '?'}</div>
+                                    <div class="chip-time">${ws.startTime} - ${ws.endTime}</div>
+                                    <div class="chip-room">${rm != null ? rm.roomCode : ''}</div>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </c:forEach>
+
+                <%-- Slot 4: 15:15 – 17:15 --%>
+                <div class="timetable-time">15:15<br>17:15</div>
+                <c:forEach var="dayDate" items="${weekDates}">
+                    <div class="timetable-cell ${dayDate == todayDate ? 'today-col' : ''}">
+                        <c:forEach var="ws" items="${weekSessions}">
+                            <c:if test="${ws.sessionDate == dayDate && ws.startTime == '15:15'}">
+                                <c:set var="crs" value="${courseMap[ws.courseId]}" />
+                                <c:set var="rm" value="${classroomMap[ws.classroomId]}" />
+                                <div class="session-chip">
+                                    <div class="chip-course">${crs != null ? crs.courseCode : '?'}</div>
+                                    <div class="chip-time">${ws.startTime} - ${ws.endTime}</div>
+                                    <div class="chip-room">${rm != null ? rm.roomCode : ''}</div>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </c:forEach>
+            </div>
+        </div>
+
+        <%-- Today's Schedule (quick list) --%>
         <div class="glass-panel" style="padding: 2rem;">
-            <h3>🗓️ Today's Schedule <small style="font-size: 0.8rem; color: #666;">(Placeholder)</small></h3>
+            <h3>🗓️ Today's Schedule</h3>
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Course</th>
-                            <th>Room</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Time</th><th>Course</th><th>Room</th><th>Action</th></tr></thead>
                     <tbody>
-                        <tr>
-                            <td>09:00 AM</td>
-                            <td>CS101 - Intro to Programming</td>
-                            <td>Room 304</td>
-                            <td><a href="#" class="btn btn-sm btn-primary">Start Class</a></td>
-                        </tr>
-                        <tr>
-                            <td>11:00 AM</td>
-                            <td>CS202 - Data Structures</td>
-                            <td>Lab A</td>
-                            <td><a href="#" class="btn btn-sm btn-primary">Start Class</a></td>
-                        </tr>
+                        <c:forEach var="cs" items="${todaySessions}">
+                            <c:set var="course" value="${courseMap[cs.courseId]}" />
+                            <c:set var="classroom" value="${classroomMap[cs.classroomId]}" />
+                            <tr>
+                                <td>${cs.startTime} - ${cs.endTime}</td>
+                                <td>${course != null ? course.courseCode : '?'} - ${course != null ? course.courseName : ''}</td>
+                                <td>${classroom != null ? classroom.roomCode : '?'} ${classroom != null ? '('.concat(classroom.building).concat(')') : ''}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/teacher/attendance?courseId=${cs.courseId}&sessionId=${cs.id}&view=register" class="btn btn-sm btn-primary">
+                                        Take Attendance
+                                    </a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty todaySessions}">
+                            <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No sessions scheduled for today.</td></tr>
+                        </c:if>
                     </tbody>
                 </table>
             </div>

@@ -1,5 +1,8 @@
 package com.example.school.dao.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.school.dao.AttendanceDao;
 import com.example.school.dao.db.DatabaseManager;
 import com.example.school.model.Attendance;
@@ -9,61 +12,54 @@ import java.util.List;
 import java.util.Optional;
 
 public class AttendanceDaoSqliteImpl implements AttendanceDao {
+    private static final Logger log = LoggerFactory.getLogger(AttendanceDaoSqliteImpl.class);
 
     @Override
     public void save(Attendance attendance) {
-        String sql = "INSERT INTO attendance (enrollment_id, attendance_date, status) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO attendance (course_session_id, student_id, status) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, attendance.getEnrollmentId());
-            pstmt.setString(2, attendance.getAttendanceDate());
+            pstmt.setInt(1, attendance.getCourseSessionId());
+            pstmt.setInt(2, attendance.getStudentId());
             pstmt.setString(3, attendance.getStatus());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
     @Override
-    public List<Attendance> findByEnrollmentId(int enrollmentId) {
+    public List<Attendance> findByStudentId(int studentId) {
         List<Attendance> list = new ArrayList<>();
-        String sql = "SELECT * FROM attendance WHERE enrollment_id = ?";
+        String sql = "SELECT * FROM attendance WHERE student_id = ?";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, enrollmentId);
+            pstmt.setInt(1, studentId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    list.add(new Attendance(
-                            rs.getInt("id"),
-                            rs.getInt("enrollment_id"),
-                            rs.getString("attendance_date"),
-                            rs.getString("status")));
+                    list.add(mapResultSetToAttendance(rs));
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return list;
     }
 
     @Override
-    public Optional<Attendance> findByEnrollmentIdAndDate(int enrollmentId, String date) {
-        String sql = "SELECT * FROM attendance WHERE enrollment_id = ? AND attendance_date = ?";
+    public Optional<Attendance> findBySessionIdAndStudentId(int courseSessionId, int studentId) {
+        String sql = "SELECT * FROM attendance WHERE course_session_id = ? AND student_id = ?";
         try (Connection conn = DatabaseManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, enrollmentId);
-            pstmt.setString(2, date);
+            pstmt.setInt(1, courseSessionId);
+            pstmt.setInt(2, studentId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.of(new Attendance(
-                            rs.getInt("id"),
-                            rs.getInt("enrollment_id"),
-                            rs.getString("attendance_date"),
-                            rs.getString("status")));
+                    return Optional.of(mapResultSetToAttendance(rs));
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
         return Optional.empty();
     }
@@ -77,57 +73,53 @@ public class AttendanceDaoSqliteImpl implements AttendanceDao {
             pstmt.setInt(2, attendance.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
     }
 
     @Override
     public double getAttendanceRate(int studentId) {
-        // 1. Get all enrollments for the student
-        String enrollmentSql = "SELECT id FROM enrollments WHERE student_id = ?";
-        List<Integer> enrollmentIds = new ArrayList<>();
+        // Only count sessions that have already happened (session_date <= today)
+        String totalSql = "SELECT COUNT(*) FROM attendance a " +
+                "JOIN course_sessions cs ON a.course_session_id = cs.id " +
+                "WHERE a.student_id = ? AND cs.session_date <= date('now')";
+        String presentSql = "SELECT COUNT(*) FROM attendance a " +
+                "JOIN course_sessions cs ON a.course_session_id = cs.id " +
+                "WHERE a.student_id = ? AND UPPER(a.status) = 'PRESENT' AND cs.session_date <= date('now')";
 
-        try (Connection conn = DatabaseManager.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(enrollmentSql)) {
-            pstmt.setInt(1, studentId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    enrollmentIds.add(rs.getInt("id"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0.0;
-        }
-
-        if (enrollmentIds.isEmpty()) {
-            return 100.0; // Default to 100% if no enrollments/attendance records found (benefit of doubt)
-        }
-
-        // 2. Count total attendance records and 'Present' status
         int totalClasses = 0;
         int presentClasses = 0;
 
-        String attendanceSql = "SELECT status FROM attendance WHERE enrollment_id = ?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(attendanceSql)) {
-
-            for (Integer enrollmentId : enrollmentIds) {
-                pstmt.setInt(1, enrollmentId);
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement pstmt = conn.prepareStatement(totalSql)) {
+                pstmt.setInt(1, studentId);
                 try (ResultSet rs = pstmt.executeQuery()) {
-                    while (rs.next()) {
-                        totalClasses++;
-                        if ("Present".equalsIgnoreCase(rs.getString("status"))) {
-                            presentClasses++;
-                        }
+                    if (rs.next()) {
+                        totalClasses = rs.getInt(1);
+                    }
+                }
+            }
+            try (PreparedStatement pstmt = conn.prepareStatement(presentSql)) {
+                pstmt.setInt(1, studentId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        presentClasses = rs.getInt(1);
                     }
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("An exception occurred: ", e);
         }
 
         return totalClasses > 0 ? ((double) presentClasses / totalClasses) * 100.0 : 100.0;
+    }
+
+    private Attendance mapResultSetToAttendance(ResultSet rs) throws SQLException {
+        return new Attendance(
+                rs.getInt("id"),
+                rs.getInt("course_session_id"),
+                rs.getInt("student_id"),
+                rs.getString("status"),
+                rs.getString("marked_at"));
     }
 }

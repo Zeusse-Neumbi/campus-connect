@@ -6,9 +6,9 @@ import java.util.List;
 public interface AttendanceDao {
     void save(Attendance attendance);
 
-    List<Attendance> findByEnrollmentId(int enrollmentId);
+    List<Attendance> findByStudentId(int studentId);
 
-    java.util.Optional<Attendance> findByEnrollmentIdAndDate(int enrollmentId, String date);
+    java.util.Optional<Attendance> findBySessionIdAndStudentId(int courseSessionId, int studentId);
 
     void update(Attendance attendance);
 
