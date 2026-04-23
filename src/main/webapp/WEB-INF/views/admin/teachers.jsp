@@ -68,13 +68,13 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
+            <%-- Pagination --%>
             <tags:pagination currentPage="${currentPage}" totalPages="${totalPages}" queryString="&q=${searchQuery}" />
         </div>
     </div>
 </div>
 
-<!-- Teacher Modal -->
+<%-- Teacher Modal --%>
 <div id="teacherModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -96,7 +96,7 @@
     </div>
 </div>
 
-<!-- Delete Form -->
+<%-- Delete Form --%>
 <form id="deleteForm" action="${pageContext.request.contextPath}/admin/teachers" method="post" style="display:none;">
     <input type="hidden" name="action" value="delete">
     <input type="hidden" name="id" id="deleteId">

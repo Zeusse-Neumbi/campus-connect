@@ -166,6 +166,25 @@ public class AdminAccountsHandler implements ActionHandler {
         int totalLinks = adminService.countStudentParentLinks(search);
         int totalPages = (int) Math.ceil((double) totalLinks / pageSize);
 
+        java.util.Map<Integer, Student> studentMap = new java.util.HashMap<>();
+        java.util.Map<Integer, Parent> parentMap = new java.util.HashMap<>();
+        java.util.Map<Integer, User> userMap = new java.util.HashMap<>();
+        for (java.util.Map<String, Object> link : links) {
+            int sid = (Integer) link.get("studentId");
+            int pid = (Integer) link.get("parentId");
+            adminService.getStudentById(sid).ifPresent(s -> {
+                studentMap.put(sid, s);
+                adminService.getUserById(s.getUserId()).ifPresent(u -> userMap.put(u.getId(), u));
+            });
+            adminService.getParentById(pid).ifPresent(p -> {
+                parentMap.put(pid, p);
+                adminService.getUserById(p.getUserId()).ifPresent(u -> userMap.put(u.getId(), u));
+            });
+        }
+
+        req.setAttribute("studentMap", studentMap);
+        req.setAttribute("parentMap", parentMap);
+        req.setAttribute("userMap", userMap);
         req.setAttribute("links", links);
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPages", totalPages);

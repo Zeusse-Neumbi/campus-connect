@@ -101,10 +101,16 @@ public class TeacherAcademicsHandler implements ActionHandler {
                     req.setAttribute("assignedStudentIds", assignedIds);
 
                     List<java.util.Map<String, Object>> currentAssigned = new java.util.ArrayList<>();
+                    java.util.Map<Integer, java.util.Map<String, Object>> studentInfoMap = new java.util.HashMap<>();
                     for (java.util.Map<String, Object> s : enrolledStudents) {
-                        if (assignedIds.contains((Integer) s.get("studentId"))) currentAssigned.add(s);
+                        int sid = (Integer) s.get("studentId");
+                        if (assignedIds.contains(sid)) {
+                            currentAssigned.add(s);
+                            studentInfoMap.put(sid, s);
+                        }
                     }
-                    req.setAttribute("assignedStudentsData", currentAssigned);
+                    req.setAttribute("studentsInGroup", assignedStudents);
+                    req.setAttribute("studentInfoMap", studentInfoMap);
 
                     groups.stream().filter(g -> g.getId() == groupId).findFirst().ifPresent(g -> req.setAttribute("selectedGroup", g));
                 }
@@ -130,6 +136,15 @@ public class TeacherAcademicsHandler implements ActionHandler {
             int groupId = ParseUtil.parseOptionalInt(req.getParameter("groupId"), 0);
             int studentId = ParseUtil.parseOptionalInt(req.getParameter("studentId"), 0);
             int courseId = ParseUtil.parseOptionalInt(req.getParameter("courseId"), 0);
+            java.util.Optional<CourseGroup> grpOpt = teacherService.getGroupById(groupId);
+            if (grpOpt.isPresent()) {
+                int capacity = grpOpt.get().getCapacity();
+                int currentStudents = teacherService.getStudentsInGroup(groupId).size();
+                if (currentStudents >= capacity) {
+                    resp.sendRedirect(req.getContextPath() + "/teacher/groups?courseId=" + courseId + "&groupId=" + groupId + "&error=full");
+                    return;
+                }
+            }
             teacherService.addStudentToGroup(studentId, groupId);
             resp.sendRedirect(req.getContextPath() + "/teacher/groups?courseId=" + courseId + "&groupId=" + groupId);
             
@@ -172,8 +187,10 @@ public class TeacherAcademicsHandler implements ActionHandler {
                 java.util.Collections.shuffle(unassigned);
                 int currentCount = teacherService.getStudentsInGroup(groupId).size();
                 int slotsLeft = group.getCapacity() - currentCount;
-                for (int i = 0; i < Math.min(slotsLeft, unassigned.size()); i++) {
-                    teacherService.addStudentToGroup(unassigned.get(i), groupId);
+                if (slotsLeft > 0) {
+                    for (int i = 0; i < Math.min(slotsLeft, unassigned.size()); i++) {
+                        teacherService.addStudentToGroup(unassigned.get(i), groupId);
+                    }
                 }
                 resp.sendRedirect(req.getContextPath() + "/teacher/groups?courseId=" + courseId + "&groupId=" + groupId);
             } catch (Exception e) {

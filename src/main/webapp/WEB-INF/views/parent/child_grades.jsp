@@ -14,7 +14,7 @@
         <div class="header glass-panel">
             <div class="page-title">Grades — ${childUser.firstName} ${childUser.lastName}</div>
             <div style="flex-grow: 1;"></div>
-            <a href="${pageContext.request.contextPath}/parent/children" class="btn btn-sm" style="background: rgba(255,255,255,0.1); margin-right: 1rem;">← Back</a>
+            <a href="${pageContext.request.contextPath}/parent/dashboard" class="btn btn-sm" style="background: rgba(255,255,255,0.1); margin-right: 1rem;">← Back</a>
             <div class="user-profile">
                 <span><strong>${sessionScope.user.firstName}</strong></span>
                 <div class="avatar" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">${sessionScope.user.firstName.substring(0,1)}</div>

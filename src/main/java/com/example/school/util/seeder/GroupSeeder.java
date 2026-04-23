@@ -45,16 +45,24 @@ public class GroupSeeder {
                     }
                 }
 
+                // 20% chance to not have groups
+                if (random.nextDouble() > 0.8) continue;
+
                 if (enrolledStudentIds.isEmpty()) continue;
 
-                // Create 2 groups for the course
-                int numGroups = 5; // Split into Group A and Group B
+                // Random capacity for this course (10, 15, 20 or 25)
+                int courseCapacity = (random.nextInt(4) + 2) * 5; 
+                int numGroups = (int) Math.ceil((double) enrolledStudentIds.size() / courseCapacity);
+                if (numGroups == 0) numGroups = 1;
+
                 List<Integer> groupIds = new ArrayList<>();
+                String[] groupTypes = {"Group ", "Lab ", "Tutorial ", "Seminar "};
+                String type = groupTypes[random.nextInt(groupTypes.length)];
 
                 for (int i = 0; i < numGroups; i++) {
                     pstmtGroup.setInt(1, courseId);
-                    pstmtGroup.setString(2, "Group " + groupSuffixes[i]);
-                    pstmtGroup.setInt(3, 10); // Standard capacity
+                    pstmtGroup.setString(2, type + groupSuffixes[i % groupSuffixes.length]);
+                    pstmtGroup.setInt(3, courseCapacity);
                     pstmtGroup.executeUpdate();
 
                     try (ResultSet rsGroup = pstmtGroup.getGeneratedKeys()) {
@@ -64,17 +72,20 @@ public class GroupSeeder {
                     }
                 }
 
-                // Randomly assign enrolled students into these groups
-                for (int studentId : enrolledStudentIds) {
-                    int groupId = groupIds.get(random.nextInt(groupIds.size()));
-                    pstmtStudentGroup.setInt(1, studentId);
-                    pstmtStudentGroup.setInt(2, groupId);
-                    try {
-                        pstmtStudentGroup.executeUpdate();
-                    } catch (SQLException ex) {
-                        // Ignore constraint violations if a student is somehow assigned twice
+                // Randomly divide students
+                java.util.Collections.shuffle(enrolledStudentIds);
+                int studentIdx = 0;
+                for (int groupId : groupIds) {
+                    for (int i = 0; i < courseCapacity && studentIdx < enrolledStudentIds.size(); i++) {
+                        pstmtStudentGroup.setInt(1, enrolledStudentIds.get(studentIdx++));
+                        pstmtStudentGroup.setInt(2, groupId);
+                        try {
+                            pstmtStudentGroup.executeUpdate();
+                        } catch (SQLException ex) { }
                     }
                 }
+
+                // (Students already randomly divided among the groups)
             }
 
             conn.commit();

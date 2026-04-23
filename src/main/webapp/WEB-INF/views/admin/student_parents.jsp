@@ -65,7 +65,7 @@
     </div>
 </div>
 
-<!-- Link Modal -->
+<%-- Link Modal --%>
 <div id="linkModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -108,7 +108,7 @@
     </div>
 </div>
 
-<!-- Unlink Form -->
+<%-- Unlink Form --%>
 <form id="unlinkForm" action="${pageContext.request.contextPath}/admin/student-parents" method="post" style="display:none;">
     <input type="hidden" name="action" value="unlink">
     <input type="hidden" name="studentId" id="unlinkStudentId">

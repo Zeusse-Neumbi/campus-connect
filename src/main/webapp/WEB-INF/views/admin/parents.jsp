@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+ <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <html>
@@ -15,7 +15,7 @@
         <div class="header glass-panel">
             <div class="page-title">Parent Management</div>
             <div class="user-profile">
-                <span>Admin <strong>${sessionScope.user.firstName}</strong></span>
+                <span>Admin <stron>${sessionScope.user.firstName}</stron></span>
                 <div class="avatar" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">${sessionScope.user.firstName.substring(0,1)}</div>
             </div>
         </div>
@@ -67,13 +67,13 @@
     </div>
 </div>
 
-<!-- Delete Form -->
+<%-- Delete Form --%>
 <form id="deleteForm" action="${pageContext.request.contextPath}/admin/parents" method="post" style="display:none;">
     <input type="hidden" name="action" value="delete">
     <input type="hidden" name="id" id="deleteId">
 </form>
 
-<!-- Edit Parent Modal -->
+<%-- Edit Parent Modal --%>
 <div id="parentModal" class="modal">
     <div class="modal-content" style="max-width: 500px;">
         <span class="close" onclick="closeModal()">&times;</span>

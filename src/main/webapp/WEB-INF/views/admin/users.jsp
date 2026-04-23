@@ -90,13 +90,13 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
+            <%-- Pagination --%>
             <tags:pagination currentPage="${currentPage}" totalPages="${totalPages}" queryString="&q=${searchQuery}" />
         </div>
     </div>
 </div>
 
-<!-- User Modal -->
+<%-- User Modal --%>
 <div id="userModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -135,7 +135,7 @@
                 </select>
             </div>
 
-            <!-- Student Fields -->
+            <%-- Student Fields --%>
             <div id="studentFields" style="display:none; border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px;">
                  <h4>Student Details</h4>
                  <div class="form-group">
@@ -148,7 +148,7 @@
                 </div>
             </div>
 
-            <!-- Teacher Fields -->
+            <%-- Teacher Fields --%>
             <div id="teacherFields" style="display:none; border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px;">
                 <h4>Teacher Details</h4>
                 <div class="form-group">
@@ -161,7 +161,7 @@
                 </div>
             </div>
 
-            <!-- Parent Fields -->
+            <%-- Parent Fields --%>
             <div id="parentFields" style="display:none; border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px;">
                 <h4>Parent Details</h4>
                 <div class="form-group">
@@ -179,7 +179,7 @@
     </div>
 </div>
 
-<!-- Delete Form -->
+<%-- Delete Form --%>
 <form id="deleteForm" action="${pageContext.request.contextPath}/admin/users" method="post" style="display:none;">
     <input type="hidden" name="action" value="delete">
     <input type="hidden" name="id" id="deleteId">

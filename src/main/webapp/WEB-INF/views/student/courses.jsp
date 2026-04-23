@@ -51,7 +51,7 @@
     </div>
 </div>
 
-<!-- Enroll Modal -->
+<%-- Enroll Modal --%>
 <div id="enrollModal" class="modal">
     <div class="modal-content" style="max-width: 700px;">
         <span class="close" onclick="closeEnrollModal()">&times;</span>

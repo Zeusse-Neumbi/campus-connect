@@ -1,0 +1,10 @@
+.transcript-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; }
+.summary-block { display: flex; justify-content: space-around; background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; }
+.summary-item { text-align: center; }
+.summary-value { font-size: 1.5rem; font-weight: 600; color: var(--primary-color); }
+.summary-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
+.course-card { background: rgba(255,255,255,0.5); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+.course-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(0,0,0,0.03); font-weight: 500; }
+.course-stats { display: flex; gap: 1.5rem; font-size: 0.9rem; }
+.course-stat span { font-weight: 600; }
+.course-details { padding: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.85rem; }

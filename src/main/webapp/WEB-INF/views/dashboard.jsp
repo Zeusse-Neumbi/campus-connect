@@ -7,11 +7,11 @@
 </head>
 <body>
 
-    <!-- Include Header -->
+    <%-- Include Header --%>
     <jsp:include page="/WEB-INF/common/header.jsp"/>
 
     <div class="main-container">
-        <!-- Include Sidebar -->
+        <%-- Include Sidebar --%>
         <jsp:include page="/WEB-INF/common/sidebar.jsp"/>
 
         <div class="content">

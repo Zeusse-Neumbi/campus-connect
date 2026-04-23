@@ -42,7 +42,7 @@
                         <tr>
                             <th>Student ID</th>
                             <th>Name</th>
-                            <th>Class/Year</th>
+                            <th>Date of Birth</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -51,7 +51,7 @@
                              <tr>
                                 <td>${s.studentNumber}</td>
                                 <td>${userMap[s.userId].firstName} ${userMap[s.userId].lastName}</td>
-                                <td>Year 1</td>
+                                <td>${s.dateOfBirth}</td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/admin/impersonate?userId=${s.userId}" class="btn btn-sm btn-primary">View Dashboard</a>
                                     <button class="btn btn-sm btn-primary" onclick="openModal('update', ${s.id}, ${s.userId}, '${s.studentNumber}', '${s.dateOfBirth}')">Edit</button>
@@ -68,13 +68,13 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
+            <%-- Pagination --%>
             <tags:pagination currentPage="${currentPage}" totalPages="${totalPages}" queryString="&q=${searchQuery}" />
         </div>
     </div>
 </div>
 
-<!-- Student Modal -->
+<%-- Student Modal --%>
 <div id="studentModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -103,7 +103,7 @@
     </div>
 </div>
 
-<!-- Delete Form -->
+<%-- Delete Form --%>
 <form id="deleteForm" action="${pageContext.request.contextPath}/admin/students" method="post" style="display:none;">
     <input type="hidden" name="action" value="delete">
     <input type="hidden" name="id" id="deleteId">

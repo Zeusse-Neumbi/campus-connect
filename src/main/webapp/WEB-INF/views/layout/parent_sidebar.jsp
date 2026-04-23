@@ -10,11 +10,6 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/parent/children" class="${pageContext.request.requestURI.endsWith('/children.jsp') ? 'active' : ''}">
-                My Children
-            </a>
-        </li>
-        <li class="nav-item">
             <a href="${pageContext.request.contextPath}/parent/profile" class="${pageContext.request.requestURI.endsWith('/profile.jsp') ? 'active' : ''}">
                 Profile
             </a>

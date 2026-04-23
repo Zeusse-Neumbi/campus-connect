@@ -240,9 +240,41 @@ public class AdminAcademicsHandler implements ActionHandler {
                     ParseUtil.parseOptionalInt(req.getParameter("courseId"), 0),
                     courseGroupId, ParseUtil.parseOptionalInt(req.getParameter("classroomId"), 0),
                     req.getParameter("sessionDate"), req.getParameter("startTime"), req.getParameter("endTime"));
+
+            java.time.LocalTime newStart = java.time.LocalTime.parse(session.getStartTime());
+            java.time.LocalTime newEnd = java.time.LocalTime.parse(session.getEndTime());
             
-            if ("create".equals(action)) adminService.createCourseSession(session);
-            else adminService.updateCourseSession(session);
+            Course newCourse = adminService.getAllCourses().stream()
+                    .filter(c -> c.getId() == session.getCourseId()).findFirst().orElse(null);
+            int newTeacherId = newCourse != null ? newCourse.getTeacherId() : -1;
+
+            boolean hasOverlap = false;
+            List<CourseSession> dailySessions = adminService.getCourseSessionsByDateRange(session.getSessionDate(), session.getSessionDate());
+            for (CourseSession cs : dailySessions) {
+                if ("update".equals(action) && cs.getId() == session.getId()) continue;
+                
+                java.time.LocalTime csStart = java.time.LocalTime.parse(cs.getStartTime());
+                java.time.LocalTime csEnd = java.time.LocalTime.parse(cs.getEndTime());
+                
+                if (newStart.isBefore(csEnd) && newEnd.isAfter(csStart)) {
+                    if (cs.getClassroomId() == session.getClassroomId()) {
+                        hasOverlap = true; break;
+                    }
+                    Course csCourse = adminService.getAllCourses().stream()
+                            .filter(c -> c.getId() == cs.getCourseId()).findFirst().orElse(null);
+                    if (csCourse != null && newTeacherId != -1 && csCourse.getTeacherId() == newTeacherId) {
+                        hasOverlap = true; break;
+                    }
+                }
+            }
+
+            if (!hasOverlap) {
+                if ("create".equals(action)) adminService.createCourseSession(session);
+                else adminService.updateCourseSession(session);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/admin/sessions?error=overlap");
+                return;
+            }
         } else if ("delete".equals(action)) {
             adminService.deleteCourseSession(ParseUtil.parseOptionalInt(req.getParameter("id"), 0));
         }

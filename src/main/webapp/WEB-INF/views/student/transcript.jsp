@@ -6,18 +6,7 @@
     <jsp:include page="/WEB-INF/views/layout/head.jsp" />
     <title>My Transcript - School Management</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        .transcript-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; }
-        .summary-block { display: flex; justify-content: space-around; background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; }
-        .summary-item { text-align: center; }
-        .summary-value { font-size: 1.5rem; font-weight: 600; color: var(--primary-color); }
-        .summary-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
-        .course-card { background: rgba(255,255,255,0.5); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
-        .course-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(0,0,0,0.03); font-weight: 500; }
-        .course-stats { display: flex; gap: 1.5rem; font-size: 0.9rem; }
-        .course-stat span { font-weight: 600; }
-        .course-details { padding: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.85rem; }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/transcript.css">
 </head>
 <body>
 
@@ -28,7 +17,7 @@
         <div class="header glass-panel">
             <div class="page-title">Transcript Generator</div>
             <div style="flex-grow: 1;"></div>
-            <button onclick="generatePDF()" class="btn btn-sm" style="background: #ef4444; color: white; margin-right: 1rem;">📄 Export PDF</button>
+            <button onclick="generatePDF('${sessionScope.user.firstName.replace('\'', '\\\'')}', '${sessionScope.user.lastName.replace('\'', '\\\'')}')" class="btn btn-sm" style="background: #ef4444; color: white; margin-right: 1rem;">📄 Export PDF</button>
             <a href="${pageContext.request.contextPath}/student/dashboard" class="btn btn-sm" style="background: rgba(255,255,255,0.1); margin-right: 1rem;">← Back</a>
             <div class="user-profile">
                 <span><strong>${sessionScope.user.firstName}</strong></span>
@@ -42,7 +31,7 @@
                 <h1 style="margin:0; font-size: 1.8rem;">Official Academic Transcript</h1>
                 <p style="margin: 0.5rem 0 0; color: #555;">Student: <strong>${sessionScope.user.firstName} ${sessionScope.user.lastName}</strong></p>
                 <p style="margin: 0; color: #555;">Student ID: ${student.studentNumber}</p>
-                <p style="margin: 0; color: #555;">Generated on: <script>document.write(new Date().toLocaleDateString());</script></p>
+                <p style="margin: 0; color: #555;">Generated on: <c:set var="now" value="<%=new java.util.Date()%>"/><fmt:formatDate value="${now}" pattern="dd/MM/yyyy"/></p>
             </div>
 
             <div class="summary-block">
@@ -100,20 +89,6 @@
     </div>
 </div>
 
-<script>
-    function generatePDF() {
-        const element = document.getElementById('transcriptContent');
-        const opt = {
-            margin:       10,
-            filename:     'Transcript_${sessionScope.user.firstName}_${sessionScope.user.lastName}.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // Output to PDF
-        html2pdf().set(opt).from(element).save();
-    }
-</script>
+<script src="${pageContext.request.contextPath}/assets/js/student/transcript.js"></script>
 </body>
 </html>

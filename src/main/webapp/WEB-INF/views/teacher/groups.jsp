@@ -34,7 +34,7 @@
                     </div>
                     <c:if test="${not empty selectedCourseId}">
                         <button type="button" class="btn btn-primary" onclick="document.getElementById('createGroupModal').classList.add('active')">+ Create Group</button>
-                        <button type="button" class="btn btn-sm" style="background: var(--info-color, #3b82f6); color: white;" onclick="document.getElementById('autoCreateModal').classList.add('active')">⚡ Auto-Create Groups</button>
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('autoCreateModal').classList.add('active')">⚡ Auto-Create Groups</button>
                     </c:if>
                 </div>
             </form>
@@ -67,7 +67,7 @@
                                     <form action="${pageContext.request.contextPath}/teacher/groups/random-fill" method="post" style="display:inline;">
                                         <input type="hidden" name="groupId" value="${g.id}">
                                         <input type="hidden" name="courseId" value="${selectedCourseId}">
-                                        <button type="submit" class="btn btn-sm" style="background: var(--info-color, #3b82f6); color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem;" title="Randomly fill this group with unassigned students">🎲 Fill</button>
+                                        <button type="submit" class="btn btn-sm btn-secondary" title="Randomly fill this group with unassigned students">🎲 Fill</button>
                                     </form>
                                     <form action="${pageContext.request.contextPath}/teacher/groups/delete" method="post" style="display:inline;">
                                         <input type="hidden" name="groupId" value="${g.id}">

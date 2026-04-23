@@ -6,10 +6,7 @@
     <title>Course Sessions - School Management</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/teacher-dashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/course-sessions.css">
-    <style>
-        .session-card:hover .session-hover-info { display: block; }
-        .session-hover-info { display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; z-index: 1000; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); border-radius: 4px; pointer-events: none;}
-    </style>
+
 </head>
 <body>
 
@@ -25,7 +22,13 @@
             </div>
         </div>
 
-        <div class="glass-panel" style="padding: 2rem;">
+        <c:if test="${param.error == 'overlap'}">
+            <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 1rem; margin-top: 1.5rem; border-radius: 4px;">
+                <strong style="color: #ef4444;">Conflict Error:</strong> The session could not be scheduled. Time slot overlaps with an existing booking for the selected Classroom or Teacher.
+            </div>
+        </c:if>
+
+        <div class="glass-panel" style="padding: 2rem; margin-top: 1.5rem;">
             <div class="page-toolbar">
                 <div class="toolbar-left">
                     <form id="weekForm" action="${pageContext.request.contextPath}/admin/sessions" method="get" style="display:flex; gap:10px; align-items:center;">
@@ -81,19 +84,19 @@
     </div>
 </div>
 
-<!-- Slot Details Modal -->
+<%-- Slot Details Modal --%>
 <div id="slotModal" class="modal">
     <div class="modal-content" style="max-width: 800px;">
         <span class="close" onclick="closeSlotModal()">&times;</span>
         <h2 id="slotModalTitle" style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">Sessions</h2>
         <div id="slotModalContent" style="margin: 1.5rem 0; max-height: 500px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; padding-right: 0.5rem;">
-            <!-- JS injects sessions here -->
+            <%-- JS injects sessions here --%>
         </div>
         <button class="btn btn-primary" onclick="addNewSessionForSlot()">+ Add Session in this Slot</button>
     </div>
 </div>
 
-<!-- Session Modal -->
+<%-- Session Modal --%>
 <div id="sessionModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -146,7 +149,7 @@
     </div>
 </div>
 
-<!-- Delete Form -->
+<%-- Delete Form --%>
 <form id="deleteForm" action="${pageContext.request.contextPath}/admin/sessions" method="post" style="display:none;">
     <input type="hidden" name="action" value="delete">
     <input type="hidden" name="id" id="deleteId">

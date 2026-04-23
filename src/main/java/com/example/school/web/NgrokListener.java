@@ -43,7 +43,7 @@ public class NgrokListener implements ServletContextListener {
         }
 
         try {
-            session = Session.withAuthtoken(authtoken).connect();
+            session = Session.withAuthtoken(authtoken.trim()).connect();
             Forwarder.Endpoint forwarder = session.httpEndpoint()
                     .forward(URI.create("http://localhost:9091").toURL());
             System.out.println("============================================");

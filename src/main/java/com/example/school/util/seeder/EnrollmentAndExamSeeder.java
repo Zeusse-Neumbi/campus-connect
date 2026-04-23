@@ -82,7 +82,16 @@ public class EnrollmentAndExamSeeder {
             };
             Map<Integer, Map<Integer, LocalDate>> courseSessionMap = new HashMap<>();
             
+            Map<LocalDate, Map<String, Integer>> roomBookings = new HashMap<>();
+            Map<LocalDate, Map<String, Integer>> teacherBookings = new HashMap<>();
+
             for (int courseId : courseIds) {
+                int teacherId = -1;
+                String selectTeacher = "SELECT teacher_id FROM courses WHERE id = " + courseId;
+                try (Statement stmt = conn.createStatement(); java.sql.ResultSet rs = stmt.executeQuery(selectTeacher)) {
+                    if (rs.next()) teacherId = rs.getInt("teacher_id");
+                }
+                
                 Map<Integer, LocalDate> sessionMap = new HashMap<>();
                 
                 for (int week = 0; week < 15; week++) {
@@ -90,18 +99,46 @@ public class EnrollmentAndExamSeeder {
                     Set<Integer> usedDays = new HashSet<>();
                     
                     for (int s = 0; s < sessionsThisWeek; s++) {
-                        int dayOfWeek;
+                        int offset;
+                        LocalDate sessionDate;
                         do {
-                            dayOfWeek = random.nextInt(6) - 1; // 1 to 6 (Mon to Sat)
-                        } while (usedDays.contains(dayOfWeek));
-                        usedDays.add(dayOfWeek);
-                        
-                        int classroomId = classroomIds.get(random.nextInt(classroomIds.size()));
+                            offset = random.nextInt(7); // 0 to 6 (7 days)
+                            sessionDate = semesterStart.plusWeeks(week).plusDays(offset);
+                        } while (usedDays.contains(offset) || sessionDate.getDayOfWeek() == java.time.DayOfWeek.SUNDAY);
+                        usedDays.add(offset);
                         String[] slot = timeSlots[random.nextInt(timeSlots.length)];
-                        
+                        String slotKey = slot[0] + "-" + slot[1];
+
+                        int attempts = 0;
+                        int classroomId = -1;
+                        boolean booked = false;
+
+                        while (attempts < 10) {
+                            classroomId = classroomIds.get(random.nextInt(classroomIds.size()));
+                            
+                            // Check Room Booking
+                            Map<String, Integer> dayRooms = roomBookings.computeIfAbsent(sessionDate, k -> new HashMap<>());
+                            if (dayRooms.containsKey(slotKey + "-room-" + classroomId)) {
+                                attempts++; continue;
+                            }
+                            
+                            // Check Teacher Booking
+                            Map<String, Integer> dayTeachers = teacherBookings.computeIfAbsent(sessionDate, k -> new HashMap<>());
+                            if (teacherId != -1 && dayTeachers.containsKey(slotKey + "-teacher-" + teacherId)) {
+                                attempts++; continue;
+                            }
+                            
+                            // Valid
+                            dayRooms.put(slotKey + "-room-" + classroomId, 1);
+                            dayTeachers.put(slotKey + "-teacher-" + teacherId, 1);
+                            booked = true;
+                            break;
+                        }
+
+                        if (!booked) continue;
+
                         pstmtSession.setInt(1, courseId);
                         pstmtSession.setInt(2, classroomId);
-                        LocalDate sessionDate = semesterStart.plusWeeks(week).plusDays(dayOfWeek);
                         pstmtSession.setString(3, sessionDate.toString());
                         pstmtSession.setString(4, slot[0]);
                         pstmtSession.setString(5, slot[1]);

@@ -30,32 +30,49 @@
             </div>
         </div>
 
-        <div class="metric-grid">
-            <div class="glass-panel metric-card">
-                <div class="metric-value" style="color: var(--primary-color);">${children.size()}</div>
-                <div class="metric-label">Linked Children</div>
-            </div>
-        </div>
-
-        <c:forEach var="child" items="${children}">
-            <div class="glass-panel child-card" style="margin-bottom: 1.5rem; padding: 2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div class="children-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+            <c:forEach var="child" items="${children}">
+                <div class="glass-panel metric-card" style="padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <h4>👤 ${child.user.firstName} ${child.user.lastName}</h4>
-                        <span style="color: var(--text-muted);">${child.student.studentNumber} · ${child.relationship}</span>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div class="avatar" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 1.2rem; width: 50px; height: 50px;">
+                                ${child.user.firstName.substring(0,1)}
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    ${child.user.firstName} ${child.user.lastName}
+                                </h3>
+                                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+                                    ${child.student.studentNumber} &bull; ${child.relationship}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="child-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; background: rgba(0,0,0,0.02); border-radius: 8px; padding: 1rem;">
+                            <div class="child-stat" style="text-align: center;">
+                                <div class="stat-value" style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">${child.courseCount}</div>
+                                <div class="stat-label" style="font-size: 0.75rem; color: var(--text-muted);">Courses</div>
+                            </div>
+                            <div class="child-stat" style="text-align: center;">
+                                <div class="stat-value" style="font-size: 1.2rem; font-weight: 700; color: var(--warning-color); border-left: 1px solid rgba(0,0,0,0.05); border-right: 1px solid rgba(0,0,0,0.05);">${child.gpa}</div>
+                                <div class="stat-label" style="font-size: 0.75rem; color: var(--text-muted);">Avg Grade</div>
+                            </div>
+                            <div class="child-stat" style="text-align: center;">
+                                <div class="stat-value" style="font-size: 1.2rem; font-weight: 700; color: var(--success-color);">${child.attendanceRate}%</div>
+                                <div class="stat-label" style="font-size: 0.75rem; color: var(--text-muted);">Attendance</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="child-stats">
-                        <div class="child-stat"><div class="stat-value" style="color: var(--primary-color);">${child.courseCount}</div><div class="stat-label">Courses</div></div>
-                        <div class="child-stat"><div class="stat-value" style="color: var(--warning-color);">${child.gpa}</div><div class="stat-label">Avg Grade</div></div>
-                        <div class="child-stat"><div class="stat-value" style="color: var(--success-color);">${child.attendanceRate}%</div><div class="stat-label">Attendance</div></div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <a href="${pageContext.request.contextPath}/parent/child-schedule?studentId=${child.student.id}" class="btn btn-sm" style="justify-content: center; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2);">📅 Schedule</a>
+                        <a href="${pageContext.request.contextPath}/parent/child-grades?studentId=${child.student.id}" class="btn btn-sm btn-primary" style="justify-content: center;">📝 Grades</a>
+                        <a href="${pageContext.request.contextPath}/parent/child-attendance?studentId=${child.student.id}" class="btn btn-sm" style="justify-content: center; background: var(--secondary-color); color: white;">✔️ Attendance</a>
+                        <a href="${pageContext.request.contextPath}/parent/child-transcript?studentId=${child.student.id}" class="btn btn-sm" style="justify-content: center; background: #3b82f6; color: white;">💰 Transcript</a>
                     </div>
                 </div>
-                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                    <a href="${pageContext.request.contextPath}/parent/child-grades?studentId=${child.student.id}" class="btn btn-sm btn-primary">View Grades</a>
-                    <a href="${pageContext.request.contextPath}/parent/child-attendance?studentId=${child.student.id}" class="btn btn-sm" style="background: var(--secondary-color); color: white;">View Attendance</a>
-                </div>
-            </div>
-        </c:forEach>
+            </c:forEach>
+        </div>
 
         <c:if test="${empty children}">
             <div class="glass-panel" style="padding: 2rem; text-align: center;">

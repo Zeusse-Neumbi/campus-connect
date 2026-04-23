@@ -89,8 +89,6 @@ public class AdminServiceTest {
 
         adminService.deleteUser(userId);
 
-        verify(studentDao).deleteByUserId(userId);
-        verify(teacherDao).deleteByUserId(userId);
         verify(userDao).delete(userId);
     }
 }

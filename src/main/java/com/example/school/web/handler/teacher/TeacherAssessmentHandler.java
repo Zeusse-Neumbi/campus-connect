@@ -141,7 +141,13 @@ public class TeacherAssessmentHandler implements ActionHandler {
 
                         for (java.util.Map<String, Object> map : allStudents) {
                             int studentId = (Integer) map.get("studentId");
-                            teacherService.getAttendance(sessionId, studentId).ifPresent(att -> map.put("status", att.getStatus()));
+                            teacherService.getAttendance(sessionId, studentId).ifPresent(att -> {
+                                String dbStatus = att.getStatus();
+                                if (dbStatus != null && !dbStatus.isEmpty()) {
+                                    String formatted = dbStatus.substring(0, 1).toUpperCase() + dbStatus.substring(1).toLowerCase();
+                                    map.put("status", formatted);
+                                }
+                            });
                         }
                     }
 
