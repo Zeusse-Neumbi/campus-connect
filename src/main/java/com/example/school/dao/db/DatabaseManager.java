@@ -40,7 +40,8 @@ public class DatabaseManager {
 
                         dataSource = new HikariDataSource(config);
 
-                        initDatabase();
+                        boolean seedDemoData = Boolean.parseBoolean(props.getProperty("db.seed", "true"));
+                        initDatabase(seedDemoData);
                 } catch (Exception e) {
                         throw new RuntimeException("Error initializing database connection pool", e);
                 }
@@ -50,7 +51,7 @@ public class DatabaseManager {
                 return dataSource.getConnection();
         }
 
-        private static void initDatabase() {
+        private static void initDatabase(boolean seedDemoData) {
                 try (Connection conn = getConnection();
                                 Statement stmt = conn.createStatement()) {
 
@@ -240,10 +241,12 @@ public class DatabaseManager {
                         stmt.execute("INSERT OR IGNORE INTO roles (id, role_name) VALUES (3, 'STUDENT');");
                         stmt.execute("INSERT OR IGNORE INTO roles (id, role_name) VALUES (4, 'PARENT');");
 
-                        // Call DataSeeder only if Users table is empty
-                        com.example.school.dao.UserDao userDao = new com.example.school.dao.impl.UserDaoSqliteImpl();
-                        if (userDao.count() == 0) {
-                                new com.example.school.util.DataSeeder().seed();
+                        // Call DataSeeder only if demo seeding is enabled and Users table is empty
+                        if (seedDemoData) {
+                                com.example.school.dao.UserDao userDao = new com.example.school.dao.impl.UserDaoSqliteImpl();
+                                if (userDao.count() == 0) {
+                                        new com.example.school.util.DataSeeder().seed();
+                                }
                         }
 
                 } catch (SQLException e) {

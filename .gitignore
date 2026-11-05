@@ -42,3 +42,11 @@ build/
 
 ### Environment ###
 .env
+.env.*
+!.env.example
+
+### SQLite sidecars and build output ###
+*.db-wal
+*.db-shm
+*.db-journal
+*.war

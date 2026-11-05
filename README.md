@@ -1,258 +1,183 @@
-<p align="center">
-  <h1 align="center">🎓 Campus Connect - Enterprise Edition</h1>
-  <p align="center">
-    A comprehensive, high-performance, and layered Java Web Application built for scaling complex school operations.
-    <br />
-    Built with Jakarta EE 10, utilizing a strict MVC paradigm, custom Action-Handler routing, and blazing fast SQLite batch processing.
-  </p>
-</p>
+# Campus Connect
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 17"/>
-  <img src="https://img.shields.io/badge/Jakarta_EE-10-0078D4?style=for-the-badge&logo=jakartaEE&logoColor=white" alt="Jakarta EE 10"/>
-  <img src="https://img.shields.io/badge/Maven-3.6+-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven"/>
-  <img src="https://img.shields.io/badge/SQLite-3.45-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
-  <img src="https://img.shields.io/badge/Jetty-12-FF6600?style=for-the-badge&logo=eclipsejetty&logoColor=white" alt="Jetty 12"/>
-  <img src="https://img.shields.io/badge/HikariCP-5.1-00ADD8?style=for-the-badge" alt="HikariCP"/>
-</p>
+A school management system with four role-specific portals: administration,
+teaching, student, and parent. Built with Java 17, Jakarta EE 10, JSP/JSTL, and
+SQLite.
 
----
+[![CI](https://github.com/Zeusse-Neumbi/campus-connect/actions/workflows/ci.yml/badge.svg)](https://github.com/Zeusse-Neumbi/campus-connect/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![Jakarta EE](https://img.shields.io/badge/Jakarta_EE-10-0078D4)
 
-## 📖 Table of Contents
+## Overview
 
-- [Overview](#-overview)
-- [Architecture & Design Patterns](#-architecture--design-patterns)
-- [Database & Schema Specifics](#-database--schema-specifics)
-- [Performance & Seeding](#-performance--seeding)
-- [Project Directory Structure](#-project-directory-structure)
-- [Tech Stack Details](#-tech-stack-details)
-- [Getting Started & Configuration](#-getting-started--configuration)
-- [Running Tests](#-running-tests)
-- [Default Login Credentials](#-default-login-credentials)
+Campus Connect models the day-to-day operations of a small school: courses,
+classrooms, course groups, sessions, enrollment, attendance, exams, and grades.
+Each user type gets a separate portal and permission boundary instead of sharing
+one generic dashboard.
 
----
+| Portal | What it does |
+| --- | --- |
+| **Admin** | Manage users, teachers, students, parents, courses, classrooms, groups, and sessions. View KPI dashboards and audit data. |
+| **Teacher** | View assigned courses and weekly sessions, record grades and attendance, and manage course groups. |
+| **Student** | View enrolled courses, timetable, grades, attendance, and transcript. |
+| **Parent** | View linked children's grades, attendance, schedule, and transcript. |
 
-## 🔍 Overview
+## Screenshots
 
-This School Management System is designed to centralize and streamline all functions of a modern educational institution. It exposes four perfectly segregated user portals to separate logic, state, and permissions.
+| Teacher — grades | Student — courses |
+| --- | --- |
+| ![Teacher grades](docs/screenshots/teacher_grades.jpg) | ![Student courses](docs/screenshots/student_courses.jpg) |
 
-### User Portals Deep-Dive
-1. **🛡️ Admin Panel**
-    *   **Core Responsibilities:** Master data management. Full, paginated CRUD for `Users`, `Courses`, `Classrooms`, `CourseGroups`, and `CourseSessions`.
-    *   **Features:** Impersonation mechanics (to login as teachers/students to debug), slot-based concurrent session management via interactive modals, capacity vs. enrollment validations, and system-wide KPI dashboards.
-2. **📚 Teacher Portal**
-    *   **Core Responsibilities:** Teaching operations and evaluation. 
-    *   **Features:** Weekly grid-based dynamic timetables that adapt to assigned `CourseSessions`. Advanced grade tracking supporting matrix structures for exams. Rapid attendance tracking with retrospective auto-fill functionality for past academic sessions.
-3. **🎒 Student Zone**
-    *   **Core Responsibilities:** Academic tracking and discovery.
-    *   **Features:** Real-time GPA matrix generation, historical attendance tracking analytics against courses, self-enrollment features into group dynamics, and a personalized weekly timetable.
-4. **👪 Parent Portal**
-    *   **Core Responsibilities:** Active monitoring for dependents.
-    *   **Features:** Parents are linked directly to `students` via relationship logic (`student_parents`). They securely view precise grades, warnings, attendance drops, and scheduling updates for their linked children in one dashboard.
+| Admin — teachers | Admin — users |
+| --- | --- |
+| ![Admin teachers](docs/screenshots/admin_teachers.jpg) | ![Admin users](docs/screenshots/admin_users.jpg) |
 
----
+## Architecture
 
-## 🏗 Architecture & Design Patterns
-
-The application radically parts from basic Servlet logic to ensure maintainable scaling.
-
-### 1. The Action-Handler Front Controller Pattern
-Rather than putting hundreds of endpoints into monolithic Servlets, we intercept requests through central Role-based Servlets (e.g. `AdminServlet`, `TeacherServlet`) which act as **Front Controllers**. 
-They delegate execution to specific `ActionHandlers` (e.g., `AdminAcademicsHandler`).
-*   **Result**: Servlets solely parse base routes, and `ActionHandlers` map specific subpaths (`/courses`, `/classrooms`) strictly cleanly to standalone methods (`showCourses()`, `handleCourseAction()`).
-
-### 2. High-Performance Layering
-```text
-[ JSP Views ] ⇄ [ Front Controller Servlets ] ⇄ [ Action Handlers ] 
-                                                        ↓
-[ Data Access Objects (DAOs) ] ⇄ [ ServiceFactory + Service Layer ]
-              ↓
-[ HikariCP + SQLite Engine ]
-```
-*   **Service Layer Encapsulation**: Controllers do absolutely NO business logic. Grade curving, timetable conflicts, capacity checks, and entity mapping are natively executed in standalone Service classes (`TeacherService.java`).
-*   **Service Factory (DI Simulation)**: A pure-Java Singleton Factory injects DAO instances into Services globally on startup.
-
----
-
-## 💾 Database & Schema Specifics
-
-We deploy an advanced 15-table relational paradigm strictly enforcing `PRAGMA foreign_keys = ON;` via `DatabaseManager`. 
-
-### The 15-Table Domain Map
 ```mermaid
-erDiagram
-    roles ||--o{ users : "has"
-    users ||--o| students : "is a"
-    users ||--o| teachers : "is a"
-    users ||--o| parents : "is a"
-    
-    parents ||--o{ student_parents : "linked via"
-    students ||--o{ student_parents : "linked via"
-    
-    teachers ||--o{ courses : "teaches"
-    
-    courses ||--o{ enrollments : "has"
-    students ||--o{ enrollments : "enrolled in"
-    
-    courses ||--o{ course_groups : "divided into"
-    course_groups ||--o{ student_groups : "contains"
-    students ||--o{ student_groups : "assigned to"
-    
-    courses ||--o{ course_sessions : "has sessions"
-    course_groups ||--o{ course_sessions : "attends session"
-    classrooms ||--o{ course_sessions : "hosts"
-    
-    course_sessions ||--o{ attendance : "generates"
-    students ||--o{ attendance : "tracked by"
-    
-    courses ||--o{ exams : "has"
-    exams ||--o{ exam_results : "produces"
-    students ||--o{ exam_results : "scored in"
-
-    users { int id PK }
-    students { int id PK }
-    parents { int id PK }
-    teachers { int id PK }
-    courses { int id PK }
-    course_groups { int id PK }
-    course_sessions { int id PK }
-    classrooms { int id PK}
-    exams { int id PK }
-    exam_results { int id PK }
-    attendance { int id PK }
+flowchart TB
+    Browser[Browser] --> Servlet[Role Servlet<br/>front controller]
+    Servlet --> Handler[Action handlers]
+    Handler --> Service[Service layer]
+    Service --> DAO[DAO interfaces]
+    DAO --> Impl[SQLite DAO implementations]
+    Impl --> Pool[HikariCP]
+    Pool --> DB[(SQLite)]
+    Handler --> JSP[JSP / JSTL views]
 ```
 
-### Key Schema Workflows:
-* **Unique Constraints**: A Student can only be assigned to *ONE* `course_group` per `course` (handled by `UNIQUE (student_id, course_group_id)`).
-* **Timetables**: Time management doesn't repeat magically. We rely on distinct `course_sessions` tied directly to a physical `classroom` (capacity restricted) on an explicit date.
-* **Granular Grades**: Transitioned from generic 0-20 "grade" properties. Students take `exams` of specific types and weights, which emit specific `exam_results`.
+- **Front controller per role.** `AdminServlet`, `TeacherServlet`,
+  `StudentServlet`, and `ParentServlet` dispatch subpaths to focused
+  `ActionHandler` classes.
+- **Service layer.** Business rules such as grade averaging, enrollment checks,
+  and timetable conflicts live in service classes, not servlets or JSPs.
+- **DAO layer.** SQL stays in `dao/impl`; services depend on DAO interfaces.
+- **Connection pooling.** HikariCP manages SQLite connections and enables foreign
+  keys on every connection.
+- **Server-rendered views.** JSP/JSTL keeps the UI simple and avoids a second
+  application runtime.
 
----
+## Database
 
-## 🚀 Performance & Seeding
+The schema has 15 tables covering users and roles, students, teachers, parents,
+student-parent links, courses, groups, sessions, classrooms, enrollment,
+attendance, exams, and exam results. Foreign keys are enforced with
+`PRAGMA foreign_keys = ON`.
 
-**Scaling SQLite to massive bounds** has been explicitly accounted for. 
+The application creates the schema on first boot. When the user table is empty,
+`DataSeeder` generates demo data: roughly 3,000 students, 2,000 parents, teachers,
+courses, sessions, attendance, and exam results.
 
-When resetting the database, the `DataSeeder` handles generating upwards of **3,000 students** natively. It achieves insertion in seconds due to:
-1. **Explicit Transaction Boundaries**: Batch wrapping hundreds of inserts within single SQL `.commit()` blocks using vanilla JDBC.
-2. **Prepared Statement Re-use**: Drastically eliminates query parsing overhead.
-3. **Data Faker Integration**: Generates completely realistic names, employee IDs, grades, and localized contacts dynamically.
+## Tech stack
 
-To invoke a full system reset:
+| Layer | Technology |
+| --- | --- |
+| Language | Java 17 |
+| Web | Jakarta Servlet 6.0, JSP 3.1, JSTL 3.0 |
+| Server | Jetty 12 (Maven plugin) |
+| Database | SQLite 3.45 via `sqlite-jdbc` |
+| Pooling | HikariCP 5.1 |
+| Password hashing | jBCrypt |
+| Demo data | Datafaker |
+| Tests | JUnit 5 + Mockito 5 |
+| Build | Maven 3.6+ |
+
+## Getting started
+
+### Requirements
+
+- JDK 17+
+- Maven 3.6+
+
+### Run locally
+
 ```bash
-rm school.db
-### Will rebuild and re-seed the next time of boot automatically.
-```
-
----
-
-## 📂 Project Directory Structure
-
-A look under the hood at the `src/` execution structure:
-```
-src/main/
-├── java/com/example/school/
-│   ├── dao/                        # Persistence Layer
-│   │   ├── db/DatabaseManager.java #   Bootstraps Hikari pool & PRAGMAs
-│   │   └── impl/                   #   SQL-specific query resolution
-│   │
-│   ├── model/                      # Entities (1-to-1 match with ERD)
-│   │   ├── CourseSession.java
-│   │   ├── ExamResult.java, etc...
-│   │
-│   ├── service/                    # Business State / Business Logic
-│   │   ├── ServiceFactory.java     #   Vanilla DI manager
-│   │   └── *Service.java           
-│   │
-│   ├── util/                       
-│   │   ├── DataSeeder.java         #   The high-performance batch factory
-│   │   └── PasswordUtil.java       #   jBcrypt hasher
-│   │
-│   └── web/                        # Presentation & Routing Layer
-│       ├── controller/             #   Front Controllers (Role-based Servlets)
-│       ├── handler/                #   Custom Request Dispatchers
-│       │   ├── admin/AdminAcademicsHandler.java
-│       │   └── ...                 #   (Scales linearly with new pages)
-│       └── NgrokListener.java      #   System Webhooks
-│
-└── webapp/
-    └── WEB-INF/views/              # Secure JSTL/JSP View Templates
-        ├── layout/                 # Extracted Headers/Footers
-        └── [role_namespace]/       # Isolated UI components
-```
-
----
-
-## 🛠 Tech Stack Details
-
-| Technology | Purpose in System |
-| :--- | :--- |
-| **Java 17** | Baseline platform offering modern switch cases and record potential. |
-| **Jakarta Servlets 6.0** | Core web specifications without heavy framework bloat. |
-| **Jakarta JSP/JSTL** | Provides SSR (Server-Side Rendering) for secure internal logic mapping. |
-| **SQLite 3.45** | Self-contained, serverless embedded DB providing lightning query access. |
-| **HikariCP 5.1** | The industry apex for JDBC Connection Pooling. Limits thread starvation. |
-| **jBCrypt** | Mathematical salt/hashing implementations enforcing secure credentials. |
-| **Ngrok-Java 1.0**| Provides automated reverse-proxy tunneling for public external reviews via `NgrokListener`. |
-| **Dotenv-Java** | Exposes system secrets via a `.env` map explicitly avoiding hardcoded variables. |
-
----
-
-## ⚡ Getting Started & Configuration
-
-### Base Requirements
-*   **JDK 17+**
-*   **Maven 3.6+**
-
-### 1. Installation Procedures
-```bash
-# 1. Pull the repo
-git clone <repository-url>
-cd SN_JEE
-
-# 2. Re-compile targeting Java 17
-mvn clean install
-```
-
-### 2. Environment Setup (Ngrok Remote Tunneling)
-For sharing progress externally, we hook the local server to a public URL automatically.
-1. Duplicate the template file: `cp .env.example .env`
-2. Populate the `.env` with your secure token:
-   ```env
-   # Inside .env
-   NGROK_AUTHTOKEN=your-super-secret-token
-   ```
-
-### 3. Server Boot
-Using the embedded Jetty 12 server, initialization is a single click:
-```bash
+git clone https://github.com/Zeusse-Neumbi/campus-connect.git
+cd campus-connect
+mvn clean verify
 mvn jetty:run
 ```
-1. Watch the terminal! The `NgrokListener` will print a public URL like `https://abcdef.ngrok.app`.
-2. Locally, the system defaults to: [http://localhost:9091](http://localhost:9091).
 
----
+Open <http://localhost:9091>.
 
-## 🧪 Running Tests
+The first request initializes `school.db` and seeds demo data. To reset it, stop
+the server, delete `school.db`, and start again.
 
-A mocked and verified layer exists utilizing **JUnit 5 & Mockito**, asserting core logic paths (like GPAs, attendance mapping, and validations) remain stable during refactors.
+### Optional public tunnel
+
+`NgrokListener` can expose the local server for a quick review. It is disabled
+unless `NGROK_AUTHTOKEN` is set:
+
+```bash
+cp .env.example .env
+# add your token to .env
+mvn jetty:run
+```
+
+Do not use the demo credentials or tunnel for a production deployment.
+
+## Demo credentials
+
+These accounts exist only in the seeded local database:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@school.com` | `admin123` |
+| Teacher | `firstname.lastname<id>@school.com` | `password123` |
+| Student | `firstname.lastname<id>@student.school.com` | `password123` |
+| Parent | `firstname.lastname<id>@parent.school.com` | `password123` |
+
+## Tests
+
 ```bash
 mvn test
 ```
 
----
+The suite contains 59 JUnit 5 tests across 14 test classes. It covers service
+rules, DAO behavior, password handling, parsing, model behavior, login, and a
+dashboard handler. Tests use a separate SQLite database and do not seed the full
+demo dataset.
 
-## 🔐 Default Login Credentials
+CI runs the same command on Java 17 for every push and pull request.
 
-Because of the randomized `DataSeeder`, all passwords natively default to test values unless overridden.
+## Project layout
 
-* **Admins**: `admin@school.com` / `admin123`
-* **Teachers**: Format `[firstname].[lastname][id_teacher]@school.com` / `password123`
-* **Students**: Format `[firstname].[lastname][id_student]@student.school.com` / `password123`
-* **Parents**: Format `[firstname].[lastname][id_parent]@parent.school.com` / `password123`
+```text
+src/main/java/com/example/school/
+├── dao/                  # DAO interfaces and SQLite implementations
+├── model/                # Domain entities
+├── service/              # Business rules
+├── util/                 # Seeding, parsing, password helpers
+└── web/
+    ├── controller/       # Role servlets
+    └── handler/          # Action handlers
+src/main/webapp/
+├── assets/               # CSS and JavaScript
+└── WEB-INF/views/        # JSP views and layout fragments
+```
 
----
+## Design notes
 
-<p align="center">
-  <i>This system was designed with stability, readability, and immediate scale in mind.</i>
-</p>
+- **Role boundaries are explicit.** Each portal has its own servlet and handlers;
+  a student request never reaches an admin action through a shared switch.
+- **Server-side rendering is deliberate.** The project targets a simple WAR
+  deployment and avoids a separate frontend build.
+- **Demo data is generated, not committed.** `school.db` is ignored; the seeder
+  creates a fresh dataset on first boot.
+- **SQLite is a deliberate constraint.** It keeps the project self-contained for
+  coursework and review. A production deployment would move to PostgreSQL or
+  MySQL and add migrations.
+
+## Limitations and next steps
+
+- The package name is still `com.example.school`; a production fork should rename
+  it.
+- Demo credentials and admin impersonation are for local review only.
+- The UI is server-rendered with JSP; a future version could add a REST API.
+- SQLite limits concurrent writes; the DAO layer would need a different
+  implementation for a multi-instance deployment.
+
+## License
+
+[MIT](LICENSE) © 2026 Neumbi Kemgang Zeusse

@@ -81,17 +81,20 @@ public class UserDaoSqliteImplTest {
 
     @Test
     void search_ShouldReturnMatchingUsers() {
-        String email1 = "search1" + UUID.randomUUID() + "@test.com";
-        String email2 = "search2" + UUID.randomUUID() + "@test.com";
-        userDao.save(new User(0, email1, "p", 1, "Alpha", "Omega"));
-        userDao.save(new User(0, email2, "p", 1, "Beta", "Gamma"));
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
+        String email1 = "search1" + suffix + "@test.com";
+        String email2 = "search2" + suffix + "@test.com";
+        String firstName1 = "Alpha" + suffix;
+        String firstName2 = "Beta" + suffix;
+        userDao.save(new User(0, email1, "p", 1, firstName1, "Omega"));
+        userDao.save(new User(0, email2, "p", 1, firstName2, "Gamma"));
 
-        java.util.List<User> results = userDao.search("Alpha", 1, 10);
+        java.util.List<User> results = userDao.search(firstName1, 1, 10);
         assertEquals(1, results.size());
-        assertEquals("Alpha", results.get(0).getFirstName());
-        
+        assertEquals(firstName1, results.get(0).getFirstName());
+
         results = userDao.search(email2, 1, 10);
         assertEquals(1, results.size());
-        assertEquals("Beta", results.get(0).getFirstName());
+        assertEquals(firstName2, results.get(0).getFirstName());
     }
 }
